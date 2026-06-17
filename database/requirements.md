@@ -1,90 +1,84 @@
 # TRIVARNA Database Requirements
 
-## Overview
-
-The database is responsible for storing and managing all user, wellness, scheduling, AI, and personalization data required by the TRIVARNA platform.
-
 ## Database Technology
 
 - Supabase
 - PostgreSQL
 
-## Core Objectives
+## Purpose
 
-- Store user profile information
-- Track daily wellness check-ins
-- Store journal entries
-- Calculate and store TRIVARNA scores
-- Manage goals and habits
-- Generate and store AI schedules
-- Store AI insights and recommendations
-- Predict burnout risk
-- Store AI conversation history
-- Maintain user memory for personalization and RAG
+The database is responsible for storing user information, onboarding responses, wellness tracking data, AI-generated plans, goals, habits, schedules, journals, and burnout prediction data.
+
+## Modules Supported
+
+1. User Management
+2. Onboarding Assessment
+3. Profile Analysis
+4. AI Planning
+5. Daily Wellness Tracking
+6. Journaling
+7. Goal Tracking
+8. Habit Tracking
+9. Burnout Prediction
+10. Adaptive Scheduling
 
 ## Tables
 
-### 1. profiles
+### profiles
 Stores user profile information.
 
-### 2. daily_checkins
-Stores daily wellness assessments including mood, stress, sleep, energy, hydration, exercise, and productivity.
+### onboarding_responses
+Stores onboarding assessment answers.
 
-### 3. journals
-Stores user journal entries and emotion analysis results.
+### profile_analysis
+Stores AI-generated onboarding analysis.
 
-### 4. trivarna_scores
-Stores Mind, Body, Lifestyle, and Overall Balance scores.
+### ai_plans
+Stores personalized plans generated after onboarding.
 
-### 5. goals
-Stores user goals and progress tracking.
+### daily_checkins
+Stores daily wellness information.
 
-### 6. habits
+### journals
+Stores user journal entries.
+
+### trivarna_scores
+Stores Mind, Body, Lifestyle, and Overall scores.
+
+### burnout_predictions
+Stores burnout prediction results.
+
+### goals
+Stores user goals and progress.
+
+### habits
 Stores user habits.
 
-### 7. habit_logs
-Stores habit completion records.
+### habit_logs
+Stores habit completion history.
 
-### 8. schedules
+### schedules
 Stores AI-generated schedules.
 
-### 9. schedule_tasks
-Stores tasks generated inside each schedule.
+### schedule_tasks
+Stores tasks inside schedules.
 
-### 10. ai_insights
-Stores AI-generated recommendations and insights.
-
-### 11. burnout_predictions
-Stores burnout scores and risk levels.
-
-### 12. conversations
-Stores conversation history between the user and AI Coach.
-
-### 13. user_memory
-Stores long-term user memory used for personalization and RAG.
-
-## Relationships
+## Database Structure
 
 auth.users
-    ↓
-profiles
-    ├── daily_checkins
-    ├── journals
-    ├── trivarna_scores
-    ├── goals
-    ├── habits
-    │      └── habit_logs
-    ├── schedules
-    │      └── schedule_tasks
-    ├── ai_insights
-    ├── burnout_predictions
-    ├── conversations
-    └── user_memory
-
-## Security
-
-Row Level Security (RLS) will be enabled on all user-related tables to ensure users can access only their own data.
-
-## Total Tables
-
-13
+      │
+      ▼
+   profiles
+      │
+      ├── onboarding_responses
+      ├── profile_analysis
+      ├── ai_plans
+      ├── daily_checkins
+      ├── journals
+      ├── trivarna_scores
+      ├── burnout_predictions
+      ├── goals
+      ├── habits
+      │      └── habit_logs
+      └── schedules
+             └── schedule_tasks

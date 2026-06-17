@@ -1,170 +1,171 @@
 -- ==========================================
--- PROFILES
+-- TRIVARNA SAMPLE DATA
 -- ==========================================
+
+-- Profile
 
 INSERT INTO profiles (
-id,
-full_name,
-age,
-occupation
+    id,
+    full_name,
+    age,
+    occupation
 )
 VALUES (
-'11111111-1111-1111-1111-111111111111',
-'Demo User',
-21,
-'Student'
+    '00000000-0000-0000-0000-000000000001',
+    'Demo User',
+    21,
+    'Student'
 );
 
--- ==========================================
--- DAILY CHECKINS
--- ==========================================
+-- Daily Check-In
 
 INSERT INTO daily_checkins (
-user_id,
-mood_score,
-stress_level,
-energy_level,
-sleep_hours,
-water_intake,
-exercise_minutes,
-productivity_score,
-notes
+    user_id,
+    mood_score,
+    stress_level,
+    energy_level,
+    sleep_hours,
+    water_intake,
+    exercise_minutes,
+    productivity_score,
+    notes
 )
 VALUES (
-'11111111-1111-1111-1111-111111111111',
-8,
-4,
-7,
-7.5,
-2.5,
-30,
-8,
-'Feeling productive today'
+    '00000000-0000-0000-0000-000000000001',
+    8,
+    4,
+    7,
+    7.5,
+    2.5,
+    30,
+    8,
+    'Feeling productive today'
 );
 
--- ==========================================
--- TRIVARNA SCORES
--- ==========================================
+-- Journal
+
+INSERT INTO journals (
+    user_id,
+    content,
+    emotion_detected,
+    sentiment_score
+)
+VALUES (
+    '00000000-0000-0000-0000-000000000001',
+    'Today was a productive day.',
+    'Happy',
+    0.85
+);
+
+-- TRIVARNA Scores
 
 INSERT INTO trivarna_scores (
-user_id,
-mind_score,
-body_score,
-lifestyle_score,
-overall_score
+    user_id,
+    mind_score,
+    body_score,
+    lifestyle_score,
+    overall_score
 )
 VALUES (
-'11111111-1111-1111-1111-111111111111',
-78,
-82,
-75,
-78
+    '00000000-0000-0000-0000-000000000001',
+    78,
+    82,
+    75,
+    78
 );
 
--- ==========================================
--- BURNOUT PREDICTIONS
--- ==========================================
+-- Burnout Prediction
 
 INSERT INTO burnout_predictions (
-user_id,
-burnout_score,
-risk_level
+    user_id,
+    burnout_score,
+    risk_level
 )
 VALUES (
-'11111111-1111-1111-1111-111111111111',
-25,
-'Low'
+    '00000000-0000-0000-0000-000000000001',
+    25,
+    'Low'
 );
 
--- ==========================================
--- GOALS
--- ==========================================
+-- Goal
 
 INSERT INTO goals (
-user_id,
-goal_name,
-category,
-target_date,
-progress_percentage,
-status
+    user_id,
+    goal_name,
+    category,
+    target_date,
+    progress_percentage,
+    status
 )
 VALUES (
-'11111111-1111-1111-1111-111111111111',
-'Exercise Daily',
-'Fitness',
-'2026-12-31',
-30,
-'active'
+    '00000000-0000-0000-0000-000000000001',
+    'Exercise Daily',
+    'Fitness',
+    '2026-12-31',
+    30,
+    'active'
 );
 
--- ==========================================
--- HABITS
--- ==========================================
+-- Habit
 
 INSERT INTO habits (
-id,
-user_id,
-habit_name,
-category,
-target_frequency
+    id,
+    user_id,
+    habit_name,
+    category,
+    target_frequency
 )
 VALUES (
-'22222222-2222-2222-2222-222222222222',
-'11111111-1111-1111-1111-111111111111',
-'Morning Walk',
-'Health',
-'Daily'
+    '00000000-0000-0000-0000-000000000002',
+    '00000000-0000-0000-0000-000000000001',
+    'Morning Walk',
+    'Health',
+    'Daily'
 );
 
--- ==========================================
--- HABIT LOGS
--- ==========================================
+-- Habit Log
 
 INSERT INTO habit_logs (
-habit_id,
-completed,
-completed_date
+    habit_id,
+    completed,
+    completed_date
 )
 VALUES (
-'22222222-2222-2222-2222-222222222222',
-TRUE,
-CURRENT_DATE
+    '00000000-0000-0000-0000-000000000002',
+    TRUE,
+    CURRENT_DATE
 );
 
--- ==========================================
--- SCHEDULES
--- ==========================================
+-- Schedule
 
 INSERT INTO schedules (
-id,
-user_id,
-schedule_date,
-generated_by_ai
+    id,
+    user_id,
+    schedule_date,
+    generated_by_ai
 )
 VALUES (
-'33333333-3333-3333-3333-333333333333',
-'11111111-1111-1111-1111-111111111111',
-CURRENT_DATE,
-TRUE
+    '00000000-0000-0000-0000-000000000003',
+    '00000000-0000-0000-0000-000000000001',
+    CURRENT_DATE,
+    TRUE
 );
 
--- ==========================================
--- SCHEDULE TASKS
--- ==========================================
+-- Schedule Task
 
 INSERT INTO schedule_tasks (
-schedule_id,
-task_name,
-category,
-start_time,
-end_time,
-status
+    schedule_id,
+    task_name,
+    category,
+    start_time,
+    end_time,
+    status
 )
 VALUES (
-'33333333-3333-3333-3333-333333333333',
-'Morning Meditation',
-'Mind',
-'07:00:00',
-'07:15:00',
-'pending'
+    '00000000-0000-0000-0000-000000000003',
+    'Morning Meditation',
+    'Mind',
+    '07:00:00',
+    '07:15:00',
+    'pending'
 );
