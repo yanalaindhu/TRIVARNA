@@ -1,6 +1,40 @@
 import { Link } from "react-router-dom";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { signupUser } from "../services/authService";
 
 export default function Signup() {
+    const navigate = useNavigate();
+
+const [formData, setFormData] = useState({
+  email: "",
+  password: "",
+});
+
+const handleChange = (e) => {
+  setFormData({
+    ...formData,
+    [e.target.name]: e.target.value,
+  });
+};
+
+const handleSignup = async (e) => {
+  e.preventDefault();
+
+  try {
+    const response = await signupUser({
+      email: formData.email,
+      password: formData.password,
+    });
+
+    console.log(response);
+
+    navigate("/onboarding");
+  } catch (error) {
+  console.log("Backend Error:", error.response?.data);
+  alert(JSON.stringify(error.response?.data));
+}
+};
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#F8F7FF] px-4">
 
@@ -27,7 +61,7 @@ export default function Signup() {
         </p>
 
         {/* Form */}
-        <form className="space-y-4">
+        <form onSubmit={handleSignup} className="space-y-4">
 
           <input
             type="text"
@@ -37,15 +71,21 @@ export default function Signup() {
 
           <input
             type="email"
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
             placeholder="Email address"
             className="w-full border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-purple-500"
-          />
+        />
 
           <input
             type="password"
+            name="password"
+            value={formData.password}
+            onChange={handleChange}
             placeholder="Password"
             className="w-full border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-purple-500"
-          />
+         />
 
           <input
             type="password"
@@ -104,7 +144,7 @@ export default function Signup() {
           Already have an account?
 
           <Link
-            to="/"
+            to="/login"
             className="ml-2 text-purple-600 font-semibold"
           >
             Sign In
@@ -114,5 +154,6 @@ export default function Signup() {
       </div>
 
     </div>
+    
   );
 }

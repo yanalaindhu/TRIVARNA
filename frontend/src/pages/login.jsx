@@ -1,6 +1,49 @@
 import { Link } from "react-router-dom";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { loginUser } from "../services/authService";
 
 export default function Login() {
+    const navigate = useNavigate();
+
+const [formData, setFormData] = useState({
+  email: "",
+  password: "",
+});
+
+const handleLogin = async (e) => {
+  e.preventDefault();
+
+  try {
+    const response = await loginUser({
+  email: formData.email,
+  password: formData.password,
+});
+
+localStorage.setItem(
+  "token",
+  response.access_token
+);
+
+console.log("Login Success", response);
+
+navigate("/dashboard");
+
+   
+
+  } catch (error) {
+    console.error(error);
+    alert("Invalid email or password");
+  }
+};
+
+const handleChange = (e) => {
+  setFormData({
+    ...formData,
+    [e.target.name]: e.target.value,
+  });
+};
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#F8F7FF]">
 
@@ -30,22 +73,29 @@ export default function Login() {
           Continue your growth journey.
         </p>
 
-        <form className="space-y-4">
+        <form onSubmit={handleLogin} className="space-y-4">
 
           <input
             type="email"
-            placeholder="Email"
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
+            placeholder="Email Address"
             className="w-full border rounded-xl p-3"
-          />
+            />
 
           <input
             type="password"
+            name="password"
+            value={formData.password}
+            onChange={handleChange}
             placeholder="Password"
             className="w-full border rounded-xl p-3"
-          />
+            />
 
-          <button
-            className="
+            <button
+        type="submit"
+        className="
             w-full
             py-3
             rounded-xl
@@ -53,10 +103,11 @@ export default function Login() {
             from-purple-600
             to-indigo-500
             text-white
-            font-semibold"
-          >
-            Sign In
-          </button>
+            font-semibold
+        "
+        >
+        Sign In
+        </button>
 
         </form>
 
