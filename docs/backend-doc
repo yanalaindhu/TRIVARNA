@@ -1,0 +1,289 @@
+# Backend Status
+
+Available Features:
+
+✅ Authentication
+
+✅ Daily Check-ins
+
+✅ Dashboard
+
+✅ Goals
+
+✅ Habits
+
+✅ Schedule Generator
+
+---
+
+# Backend Base URL
+
+Local Development:
+
+http://127.0.0.1:8000
+
+Swagger Documentation:
+
+http://127.0.0.1:8000/docs
+
+---
+
+
+## 1. Authentication
+
+### Login Page
+
+Fields:
+
+* Email
+* Password
+
+API:
+
+POST /auth/login
+
+### Signup Page
+
+Fields:
+
+* Email
+* Password
+
+API:
+
+POST /auth/signup
+
+---
+
+# 2. Dashboard
+
+After login navigate to Dashboard.
+
+Display:
+
+### Wellness Scores
+
+* Mind Score
+* Body Score
+* Lifestyle Score
+* Overall Score
+
+### Burnout Status
+
+* LOW
+* MEDIUM
+* HIGH
+
+### Latest Check-in Summary
+
+### Quick Actions
+
+* Add Check-in
+* Add Goal
+* Add Habit
+* Generate Schedule
+
+API:
+
+GET /dashboard/{user_id}
+
+---
+
+# 3. Daily Check-in Page
+
+Purpose:
+
+Collect daily wellness information.
+
+Fields:
+
+* Mood Score (1-10)
+* Stress Level (1-10)
+* Energy Level (1-10)
+* Sleep Hours
+* Water Intake
+* Exercise Minutes
+* Productivity Score (1-10)
+* Notes
+
+API:
+
+POST /checkins
+
+Request:
+
+{
+"user_id": "uuid",
+"mood_score": 8,
+"stress_level": 5,
+"energy_level": 7,
+"sleep_hours": 7,
+"water_intake": 2.5,
+"exercise_minutes": 30,
+"productivity_score": 8,
+"notes": "Feeling productive"
+}
+
+---
+
+# 4. Goals Module
+
+### Goal Creation
+
+API:
+
+POST /goals
+
+Fields:
+
+* Goal Name
+* Category
+* Target Date
+
+### Goal List
+
+API:
+
+GET /goals/{user_id}
+
+Display:
+
+* Goal Name
+* Category
+* Progress %
+* Status
+
+### Goal Progress Update
+
+API:
+
+PATCH /goals/{goal_id}
+
+Fields:
+
+* Progress %
+* Status
+
+Suggested UI:
+
+Progress Bar
+
+---
+
+# 5. Habits Module
+
+### Create Habit
+
+API:
+
+POST /habits
+
+Fields:
+
+* Habit Name
+* Category
+* Target Frequency
+
+Example:
+
+* Study 2 Hours
+* Daily Exercise
+* Meditation
+
+### View Habits
+
+API:
+
+GET /habits/{user_id}
+
+### Log Habit Completion
+
+API:
+
+POST /habits/logs
+
+Suggested UI:
+
+Checkbox
+
+Example:
+
+☑ Study 2 Hours
+
+☑ Drink Water
+
+☐ Exercise
+
+---
+
+# 6. Schedule Module
+
+### Generate Schedule
+
+API:
+
+POST /schedules/generate/{user_id}
+
+Button:
+
+Generate My Schedule
+
+### View Schedule
+
+API:
+
+GET /schedules/{user_id}
+
+Display:
+
+Task Timeline
+
+Example:
+
+06:30 - Drink Water
+
+07:00 - Morning Walk
+
+09:00 - Study 2 Hours
+
+20:00 - Meditation
+
+---
+
+# User Flow
+
+Signup
+↓
+Login
+↓
+Dashboard
+↓
+Daily Check-in
+↓
+Scores Generated
+↓
+Burnout Prediction
+↓
+Goals
+↓
+Habits
+↓
+Generate Schedule
+↓
+View Schedule
+
+---
+
+# Authentication Flow
+
+Login API returns:
+
+{
+"success": true,
+"access_token": "...",
+"refresh_token": "...",
+"user": {
+"id": "user_uuid",
+"email": "[user@email.com](mailto:user@email.com)"
+}
+}
