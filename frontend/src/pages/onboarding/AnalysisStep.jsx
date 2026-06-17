@@ -4,6 +4,7 @@ import { onboardingService } from '../../services/onboardingService';
 import LoadingAnalysis from '../../components/onboarding/LoadingAnalysis';
 
 export default function AnalysisStep({ onNext }) {
+  
   const storeState = useOnboardingStore();
   const { setResults, setAIPlan } = storeState;
 
