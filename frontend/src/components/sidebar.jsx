@@ -14,6 +14,7 @@ import {
   Bot,
   LayoutDashboard
 } from "lucide-react";
+import logo from "../assets/trivarna-logo.png";
 
 import { getProfile } from "../services/profileService";
 
@@ -89,9 +90,13 @@ export default function Sidebar() {
     <aside className="w-64 bg-white border-r border-gray-100 min-h-screen flex flex-col p-5 sticky top-0 h-screen">
       {/* Brand Header */}
       <div className="flex items-center space-x-2.5 mb-8 px-2">
-        <div className="w-9 h-9 bg-purple-100 text-purple-600 border border-purple-200/50 rounded-xl flex items-center justify-center shadow-inner">
-          <Compass className="w-5 h-5 stroke-[2]" />
-        </div>
+        <div className="w-10 h-10 flex items-center justify-center">
+  <img
+    src={logo}
+    alt="Trivarna"
+    className="w-full h-full object-contain"
+  />
+</div>
         <span className="text-xl font-black text-gray-800 tracking-tight">
           TRIVARNA
         </span>

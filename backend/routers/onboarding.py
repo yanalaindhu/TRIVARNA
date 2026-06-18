@@ -3,6 +3,7 @@ from fastapi import APIRouter, HTTPException
 from schemas.onboarding import OnboardingCreate
 from database.supabase_client import supabase
 from services.ai_plan_service import generate_plan
+from services.email_service import send_email
 router = APIRouter(
     prefix="/api/onboarding",
     tags=["Onboarding"]
@@ -202,6 +203,61 @@ def complete_onboarding(user_id: str):
             "id",
             onboarding["id"]
         ).execute()
+
+        # Send onboarding results and recommendations email
+        try:
+            profile_res = supabase.table("profiles").select("email, full_name").eq("id", user_id).execute()
+            if profile_res.data:
+                user_email = profile_res.data[0].get("email")
+                full_name = profile_res.data[0].get("full_name") or "Explorer"
+                if user_email:
+                    rec_html = f"""
+                    <html>
+                        <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+                            <h2 style="color: #6C4CF1;">Your TRIVARNA Onboarding Analysis Results 🌿</h2>
+                            <p>Hi {full_name},</p>
+                            <p>Great news! Your onboarding assessment analysis is complete. Below are your diagnostic wellbeing scores and personalized recommendations:</p>
+                            
+                            <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
+                                <tr style="background-color: #F3F0FF;">
+                                    <th style="border: 1px solid #ddd; padding: 10px; text-align: left;">Wellness Category</th>
+                                    <th style="border: 1px solid #ddd; padding: 10px; text-align: center;">Score</th>
+                                </tr>
+                                <tr>
+                                    <td style="border: 1px solid #ddd; padding: 10px;">🧠 Mind Score</td>
+                                    <td style="border: 1px solid #ddd; padding: 10px; text-align: center; font-weight: bold; color: #6C4CF1;">{mind_score}/100</td>
+                                </tr>
+                                <tr>
+                                    <td style="border: 1px solid #ddd; padding: 10px;">💪 Body Score</td>
+                                    <td style="border: 1px solid #ddd; padding: 10px; text-align: center; font-weight: bold; color: #6C4CF1;">{body_score}/100</td>
+                                </tr>
+                                <tr>
+                                    <td style="border: 1px solid #ddd; padding: 10px;">⚡ Lifestyle Score</td>
+                                    <td style="border: 1px solid #ddd; padding: 10px; text-align: center; font-weight: bold; color: #6C4CF1;">{lifestyle_score}/100</td>
+                                </tr>
+                                <tr style="background-color: #F8F8FC; font-weight: bold;">
+                                    <td style="border: 1px solid #ddd; padding: 10px;">🌿 Overall Wellness Score</td>
+                                    <td style="border: 1px solid #ddd; padding: 10px; text-align: center; color: #22C55E;">{overall_score}/100</td>
+                                </tr>
+                            </table>
+
+                            <p><strong>Burnout Risk Level:</strong> <span style="color: #EF4444; font-weight: bold;">{burnout_risk}</span></p>
+
+                            <div style="background-color: #F9F9FA; padding: 15px; border-left: 4px solid #6C4CF1; margin: 20px 0; border-radius: 4px;">
+                                <h3 style="margin-top: 0; color: #6C4CF1;">Coach Recommendations Summary:</h3>
+                                <p style="font-style: italic;">"Your onboarding analysis is completed. Focus on consistent hydration, Posture during screen hours, and regular rest."</p>
+                            </div>
+
+                            <p>To view your full daily routine schedule, wellness trackers, and get more AI Coach insights, head over to your Dashboard.</p>
+                            <br />
+                            <p>Warmly,</p>
+                            <p><strong>The TRIVARNA Team</strong></p>
+                        </body>
+                    </html>
+                    """
+                    send_email(user_email, "Your TRIVARNA Onboarding Recommendations & Results 🌿", rec_html)
+        except Exception as email_err:
+            print(f"Warning: Failed to send onboarding recommendations email: {email_err}")
 
         return {
             "success": True,

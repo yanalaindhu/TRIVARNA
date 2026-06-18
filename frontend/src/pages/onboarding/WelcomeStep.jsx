@@ -17,8 +17,9 @@ export default function WelcomeStep({ onNext }) {
 
       <div className="space-y-3">
         <h1 className="text-4xl md:text-5xl font-extrabold text-text-primary tracking-tight">
-          Welcome to <span className="text-primary-purple">TRIVARNA</span> 🌸
+          Welcome to <span className="text-primary-purple">TRIVARNA</span> 
         </h1>
+        
         <p className="text-lg md:text-xl font-semibold text-secondary-purple tracking-widest uppercase text-xs">
           Mind 🧠 • Body 💪 • Soul ✨
         </p>
@@ -29,17 +30,7 @@ export default function WelcomeStep({ onNext }) {
       </p>
 
       {/* Decorative Grid or Badges */}
-      <div className="grid grid-cols-3 gap-3 w-full max-w-sm pt-4">
-        <div className="p-3 bg-gray-50 border border-gray-100 rounded-xl">
-          <span className="block text-xs font-bold text-text-secondary">🧠 MIND</span>
-        </div>
-        <div className="p-3 bg-gray-50 border border-gray-100 rounded-xl">
-          <span className="block text-xs font-bold text-text-secondary">💪 BODY</span>
-        </div>
-        <div className="p-3 bg-gray-50 border border-gray-100 rounded-xl">
-          <span className="block text-xs font-bold text-text-secondary">✨ SOUL</span>
-        </div>
-      </div>
+      
 
       <NavigationButtons
         onNext={onNext}

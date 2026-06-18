@@ -17,6 +17,7 @@ import Settings from "../pages/settings";
 import Profile from "../pages/profile";
 import ProtectedRoute from "../components/ProtectedRoute";
 import Dashboard from "../pages/dashboard";
+import ResetPassword from "../pages/ResetPassword";
 
 export default function AppRoutes() {
   const navigate = useNavigate();
@@ -24,6 +25,11 @@ export default function AppRoutes() {
   useEffect(() => {
     const hash = window.location.hash;
     if (hash && hash.includes("access_token=")) {
+      // Ignore intercepting if the user is explicitly on the reset password screen
+      if (window.location.pathname === "/reset-password") {
+        return;
+      }
+
       try {
         const params = new URLSearchParams(hash.substring(1));
         const accessToken = params.get("access_token");
@@ -58,6 +64,7 @@ export default function AppRoutes() {
       <Route path="/" element={<Home />} />
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Signup />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
       
       {/* Protected Routes */}
       <Route path="/onboarding" element={<ProtectedRoute><Onboarding /></ProtectedRoute>} />

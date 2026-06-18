@@ -4,6 +4,7 @@ import { loginUser } from "../services/authService";
 import bgImage from "../assets/backgound.png";
 import { getOnboarding } from "../services/onboardingService";
 import { Mail } from "lucide-react";
+import api from "../services/api";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -23,6 +24,26 @@ export default function Login() {
 
   const handleEmailClick = () => {
     emailInputRef.current?.focus();
+  };
+
+  const handleForgotPassword = async () => {
+    const emailInput = prompt("Please enter your email to receive a password reset link:");
+    if (!emailInput) return;
+    
+    if (!emailInput.includes("@")) {
+      alert("Please enter a valid email address");
+      return;
+    }
+
+    try {
+      const response = await api.post("/auth/forgot-password", { email: emailInput });
+      if (response.data.success) {
+        alert(response.data.message);
+      }
+    } catch (err) {
+      console.error(err);
+      alert(err.response?.data?.detail || "Failed to send password reset email.");
+    }
   };
 
   const [formData, setFormData] = useState({
@@ -139,7 +160,8 @@ export default function Login() {
           <div className="text-right">
             <button
               type="button"
-              className="text-purple-500 text-sm"
+              onClick={handleForgotPassword}
+              className="text-purple-500 text-sm hover:underline cursor-pointer"
             >
               Forgot Password?
             </button>

@@ -13,6 +13,12 @@ class Settings(BaseSettings):
 
     DEBUG: bool = True
 
+    SMTP_HOST: Optional[str] = None
+    SMTP_PORT: int = 587
+    SMTP_USER: Optional[str] = None
+    SMTP_PASSWORD: Optional[str] = None
+    SMTP_FROM: str = "Trivarna <noreply@trivarna.com>"
+
     model_config = SettingsConfigDict(
         env_file=".env",
         extra="ignore"
