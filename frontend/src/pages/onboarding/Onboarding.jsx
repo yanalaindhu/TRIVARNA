@@ -93,7 +93,7 @@ export default function Onboarding() {
           </div>
           {isQuestionnaireStep && (
             <div className="text-[10px] font-extrabold uppercase tracking-widest text-purple-600 bg-purple-50 px-3 py-1 rounded-full border border-purple-100">
-              Diagnostic Assessment
+              Onboarding Assessment
             </div>
           )}
         </div>
