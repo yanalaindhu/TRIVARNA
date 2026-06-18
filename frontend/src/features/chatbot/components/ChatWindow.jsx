@@ -84,7 +84,7 @@ export default function ChatWindow() {
                 onChange={(e) => setInput(e.target.value)}
                 disabled={isTyping}
                 placeholder={`Ask ${activeModel.name}... (e.g. try clicking the suggestion chips below)`}
-                className="w-full pl-4 pr-12 py-3.5 border border-gray-200 rounded-xl focus:border-primary-purple focus:ring-1 focus:ring-primary-purple outline-none transition-all duration-200 text-text-primary text-sm font-medium hover:border-gray-300 disabled:bg-gray-50/50"
+                className="w-full pl-4 pr-12 py-3.5 border border-gray-200 rounded-xl focus:border-[#6C4CF1] focus:ring-1 focus:ring-[#6C4CF1] outline-none transition-all duration-200 text-slate-800 text-sm font-medium hover:border-gray-300 disabled:bg-gray-50/50"
               />
               <div className="absolute right-4 text-text-secondary/40">
                 <Sparkles className="w-4 h-4" />
@@ -95,7 +95,7 @@ export default function ChatWindow() {
               disabled={!input.trim() || isTyping}
               className={`p-3.5 rounded-xl border font-bold text-sm transition-all duration-200 flex items-center justify-center text-white ${
                 input.trim() && !isTyping
-                  ? 'bg-primary-purple border-primary-purple hover:bg-secondary-purple shadow'
+                  ? 'bg-[#6C4CF1] border-[#6C4CF1] hover:bg-[#583cd1] shadow'
                   : 'bg-gray-200 border-gray-200 cursor-not-allowed text-gray-400'
               }`}
             >

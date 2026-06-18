@@ -9,7 +9,7 @@ class OnboardingCreate(BaseModel):
 
     emotion_data: Dict[str, Any]
 
-    wellbeing_drivers: Dict[str, Any]
+    wellbeing_drivers: Any
 
     stress_data: Dict[str, Any]
 

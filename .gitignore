@@ -1,0 +1,22 @@
+# Node
+node_modules/
+backend/node_modules/
+frontend/node_modules/
+
+# Python
+venv/
+__pycache__/
+*.pyc
+
+# Environment
+.env
+
+# Build
+dist/
+build/
+
+# Chroma DB
+backend/chroma_db/
+
+# VS Code
+.vscode/

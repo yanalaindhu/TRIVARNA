@@ -7,18 +7,20 @@ export default function WelcomeStep({ onNext }) {
     <div className="flex flex-col items-center justify-center text-center space-y-8 py-6 max-w-xl mx-auto">
       {/* Visual Identity Logo Icon */}
       <div className="relative flex items-center justify-center">
-        <div className="absolute w-20 h-20 bg-primary-purple/10 rounded-full blur-lg animate-pulse" />
-        <div className="w-16 h-16 bg-light-purple border border-primary-purple/20 rounded-2xl flex items-center justify-center text-primary-purple shadow-sm relative z-10">
-          <Compass className="w-9 h-9 stroke-[1.8]" />
-        </div>
+        <div className="absolute w-24 h-24 bg-primary-purple/15 rounded-full blur-xl animate-pulse" />
+        <img
+          src="/logo.png"
+          alt="Trivarna Logo"
+          className="w-28 h-28 object-contain relative z-10 filter drop-shadow-[0_4px_12px_rgba(108,76,241,0.2)]"
+        />
       </div>
 
       <div className="space-y-3">
         <h1 className="text-4xl md:text-5xl font-extrabold text-text-primary tracking-tight">
-          Welcome to <span className="text-primary-purple">TRIVARNA</span>
+          Welcome to <span className="text-primary-purple">TRIVARNA</span> 🌸
         </h1>
         <p className="text-lg md:text-xl font-semibold text-secondary-purple tracking-widest uppercase text-xs">
-          Mind • Body • Soul
+          Mind 🧠 • Body 💪 • Soul ✨
         </p>
       </div>
 

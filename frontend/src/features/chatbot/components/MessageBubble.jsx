@@ -33,14 +33,13 @@ export default function MessageBubble({ message }) {
         </div>
       )}
 
-      {/* 2. Message Bubble */}
       <div className={`max-w-[75%] rounded-2xl p-4 shadow-sm border ${
         isUser
-          ? 'bg-primary-purple border-primary-purple text-white rounded-br-none'
-          : 'bg-white border-gray-100 text-text-primary rounded-bl-none'
+          ? 'bg-[#6C4CF1] border-[#6C4CF1] text-white rounded-br-none'
+          : 'bg-white border-gray-100 text-[#111827] rounded-bl-none'
       }`}>
         {/* Message Text */}
-        <div className={isUser ? 'text-white font-medium' : 'text-text-primary'}>
+        <div className={isUser ? 'text-white font-medium' : 'text-[#111827]'}>
           {isUser ? <p className="text-sm leading-relaxed">{message.text}</p> : formatText(message.text)}
         </div>
 

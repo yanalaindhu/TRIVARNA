@@ -2,6 +2,8 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useOnboardingStore } from '../../store/onboardingStore';
 import ProgressStepper from '../../components/onboarding/ProgressStepper';
+import { motion, AnimatePresence } from 'framer-motion';
+import bgImage from '../../assets/backgound.png';
 
 // Import step components
 import WelcomeStep from './WelcomeStep';
@@ -16,8 +18,6 @@ import GoalsStep from './GoalsStep';
 import AnalysisStep from './AnalysisStep';
 import ResultsStep from './ResultsStep';
 import AIPlanStep from './AIPlanStep';
-
-import { Compass } from 'lucide-react';
 
 export default function Onboarding() {
   const navigate = useNavigate();
@@ -72,20 +72,27 @@ export default function Onboarding() {
   const isQuestionnaireStep = currentStep >= 2 && currentStep <= 9;
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col justify-between antialiased">
+    <div 
+      className="min-h-screen flex flex-col justify-between antialiased bg-cover bg-center bg-no-repeat"
+      style={{
+        backgroundImage: `url(${bgImage})`,
+      }}
+    >
       {/* 1. Global Navigation Bar */}
-      <header className="bg-white border-b border-gray-100 py-4 px-6 sticky top-0 z-50 shadow-sm">
+      <header className="bg-white/80 backdrop-blur-md border-b border-white/20 py-3 px-6 sticky top-0 z-50 shadow-sm">
         <div className="max-w-6xl mx-auto flex items-center justify-between">
           <div className="flex items-center space-x-2.5 cursor-pointer" onClick={() => navigate('/')}>
-            <div className="w-9 h-9 bg-light-purple text-primary-purple border border-primary-purple/20 rounded-xl flex items-center justify-center shadow-inner">
-              <Compass className="w-5 h-5 stroke-[2]" />
-            </div>
-            <span className="text-xl font-black text-text-primary tracking-tight">
+            <img
+              src="/logo.png"
+              alt="Trivarna Logo"
+              className="w-10 h-10 object-contain"
+            />
+            <span className="text-xl font-black text-slate-800 tracking-tight">
               TRIVARNA
             </span>
           </div>
           {isQuestionnaireStep && (
-            <div className="text-xs font-bold uppercase tracking-widest text-text-secondary">
+            <div className="text-[10px] font-extrabold uppercase tracking-widest text-purple-600 bg-purple-50 px-3 py-1 rounded-full border border-purple-100">
               Diagnostic Assessment
             </div>
           )}
@@ -94,7 +101,7 @@ export default function Onboarding() {
 
       {/* 2. Onboarding Main Body Container */}
       <main className="flex-1 flex flex-col items-center justify-center p-4 md:p-8">
-        <div className="w-full max-w-4xl bg-white border border-gray-100 rounded-2xl shadow-sm p-6 md:p-10 transition-all duration-300">
+        <div className="w-full max-w-4xl bg-white/90 backdrop-blur-lg border border-white/40 rounded-3xl shadow-2xl p-6 md:p-10 transition-all duration-300">
           
           {/* Diagnostic stepper header */}
           {isQuestionnaireStep && (
@@ -107,14 +114,22 @@ export default function Onboarding() {
           )}
 
           {/* Render Active Step with smooth transitions */}
-          <div className="transition-all duration-300 ease-in-out">
-            {renderStepContent()}
-          </div>
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={currentStep}
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -15 }}
+              transition={{ duration: 0.25, ease: "easeInOut" }}
+            >
+              {renderStepContent()}
+            </motion.div>
+          </AnimatePresence>
         </div>
       </main>
 
       {/* 3. Global Footer */}
-      <footer className="bg-white border-t border-gray-100 py-4 text-center text-xs text-text-secondary">
+      <footer className="bg-white/70 backdrop-blur-md border-t border-white/20 py-4 text-center text-xs text-gray-500 font-medium">
         <div className="max-w-6xl mx-auto px-6">
           © {new Date().getFullYear()} TRIVARNA. All rights reserved. • Mind • Body • Soul Alignment System
         </div>

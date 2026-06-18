@@ -1,1 +1,15 @@
 @import "tailwindcss";
+
+@theme {
+  --color-primary-purple: #6C4CF1;
+  --color-secondary-purple: #8B6CFF;
+  --color-light-purple: #F3F0FF;
+  --color-text-primary: #111827;
+  --color-text-secondary: #6B7280;
+  --color-success-green: #22C55E;
+  --color-warning-yellow: #F59E0B;
+  --color-danger-red: #EF4444;
+  
+  --border-radius-lg: 12px;
+  --border-radius-xl: 16px;
+}

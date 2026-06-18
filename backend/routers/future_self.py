@@ -91,3 +91,39 @@ def future_self(user_id: str):
             status_code=500,
             detail=str(e)
         )
+
+
+@router.get("/{user_id}")
+def get_future_self(user_id: str):
+
+    try:
+
+        result = (
+            supabase
+            .table("future_self_predictions")
+            .select("*")
+            .eq("user_id", user_id)
+            .order("created_at", desc=True)
+            .limit(1)
+            .execute()
+        )
+
+        if not result.data:
+            return {
+                "30_days": "Simulate your twin to view 30-day forecast.",
+                "90_days": "Simulate your twin to view 90-day forecast.",
+                "1_year": "Simulate your twin to view 1-year forecast."
+            }
+
+        pred = result.data[0]
+        return {
+            "30_days": pred.get("prediction_30_days"),
+            "90_days": pred.get("prediction_90_days"),
+            "1_year": pred.get("prediction_1_year")
+        }
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=str(e)
+        )

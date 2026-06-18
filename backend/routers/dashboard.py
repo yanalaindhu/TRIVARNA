@@ -14,6 +14,36 @@ async def get_dashboard(user_id: str):
 
     try:
 
+        latest_profile = (
+            supabase
+            .table("profile_analysis")
+            .select("*")
+            .eq("user_id", user_id)
+            .order("created_at", desc=True)
+            .limit(1)
+            .execute()
+        )
+
+        latest_plan = (
+            supabase
+            .table("ai_plans")
+            .select("*")
+            .eq("user_id", user_id)
+            .order("generated_at", desc=True)
+            .limit(1)
+            .execute()
+        )
+
+        latest_onboarding = (
+            supabase
+            .table("onboarding_responses")
+            .select("*")
+            .eq("user_id", user_id)
+            .order("created_at", desc=True)
+            .limit(1)
+            .execute()
+        )
+
         latest_checkin = (
             supabase
             .table("daily_checkins")
@@ -24,40 +54,38 @@ async def get_dashboard(user_id: str):
             .execute()
         )
 
-        latest_score = (
-            supabase
-            .table("trivarna_scores")
-            .select("*")
-            .eq("user_id", user_id)
-            .order("created_at", desc=True)
-            .limit(1)
-            .execute()
-        )
+        profile_data = latest_profile.data[0] if latest_profile.data else {}
 
-        latest_burnout = (
+        # Fetch basic profiles info (name, age, occupation)
+        user_profile_res = (
             supabase
-            .table("burnout_predictions")
+            .table("profiles")
             .select("*")
-            .eq("user_id", user_id)
-            .order("created_at", desc=True)
-            .limit(1)
+            .eq("id", user_id)
             .execute()
         )
+        if user_profile_res.data:
+            user_prof = user_profile_res.data[0]
+            for key, val in user_prof.items():
+                if val is not None or key not in profile_data:
+                    profile_data[key] = val
 
         return {
+            "profile": profile_data if profile_data else None,
+
+            "plan":
+                latest_plan.data[0]
+                if latest_plan.data
+                else None,
+
+            "onboarding":
+                latest_onboarding.data[0]
+                if latest_onboarding.data
+                else None,
+
             "latest_checkin":
                 latest_checkin.data[0]
                 if latest_checkin.data
-                else None,
-
-            "latest_scores":
-                latest_score.data[0]
-                if latest_score.data
-                else None,
-
-            "latest_burnout":
-                latest_burnout.data[0]
-                if latest_burnout.data
                 else None
         }
 

@@ -123,3 +123,21 @@ async def create_checkin(payload: CheckinCreate):
             status_code=500,
             detail=str(e)
         )
+
+@router.get("/{user_id}")
+async def get_checkins(user_id: str):
+    try:
+        result = (
+            supabase
+            .table("daily_checkins")
+            .select("*")
+            .eq("user_id", user_id)
+            .order("created_at", desc=True)
+            .execute()
+        )
+        return result.data
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=str(e)
+        )
