@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { RAG_MODELS } from '../data/ragModels';
 import { VECTOR_DATABASES } from '../data/vectorDatabases';
 import { MOCK_RESPONSES } from '../data/mockConversations';
+import api from '../../../services/api';
 
 const getWelcomeMessage = (modelId) => {
   const model = RAG_MODELS.find(m => m.id === modelId) || RAG_MODELS[0];
@@ -48,27 +49,38 @@ export const useChatbotStore = create((set, get) => ({
       isTyping: true
     }));
 
-    // Simulate RAG search latency (1000ms)
-    setTimeout(() => {
-      const currentModel = get().selectedModel;
-      const normalizedPrompt = text.toLowerCase().trim();
-      
-      const modelResponses = MOCK_RESPONSES[currentModel] || MOCK_RESPONSES['mind_rag'];
-      const responseData = modelResponses[normalizedPrompt] || modelResponses.fallback;
+    try {
+      const response = await api.post('/api/chatbot/query', {
+        model_id: get().selectedModel,
+        prompt: text
+      });
 
       const assistantMessage = {
         id: 'msg-' + Date.now() + '-assistant',
         sender: 'assistant',
-        text: responseData.text,
+        text: response.data.reply,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        sources: responseData.sources || []
+        sources: response.data.sources || []
       };
 
       set((state) => ({
         messages: [...state.messages, assistantMessage],
         isTyping: false
       }));
-    }, 1000);
+    } catch (error) {
+      console.error("RAG Query failed:", error);
+      const errorMessage = {
+        id: 'msg-' + Date.now() + '-error',
+        sender: 'assistant',
+        text: "Sorry, I encountered an issue querying your vector stores. Please ensure the backend server is running and try again.",
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        sources: []
+      };
+      set((state) => ({
+        messages: [...state.messages, errorMessage],
+        isTyping: false
+      }));
+    }
   },
 
   clearHistory: () => {

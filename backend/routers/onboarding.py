@@ -170,6 +170,11 @@ def complete_onboarding(user_id: str):
             .execute()
         )
 
+        # Archive previous completed/updated onboarding responses for this user to avoid unique key violation
+        supabase.table("onboarding_responses").update({
+            "status": "archived"
+        }).eq("user_id", user_id).in_("status", ["completed", "updated"]).execute()
+
         # Mark onboarding complete
 
         supabase.table(
