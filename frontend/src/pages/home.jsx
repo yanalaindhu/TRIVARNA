@@ -21,10 +21,8 @@ export default function Home() {
       {/* Content */}
       <div className="relative z-10 flex h-full flex-col items-center justify-center px-8 text-center">
 
-
-
         {/* Tagline */}
-        <div className="max-w-sm">
+        <div className="max-w-sm mt-24">
 
           <h2 className="text-3xl font-bold text-white">
             Balance Your Mind,
