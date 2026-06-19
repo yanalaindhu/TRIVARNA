@@ -1,5 +1,6 @@
 from fastapi import APIRouter
 from fastapi import HTTPException
+import os
 
 from schemas.auth import SignupRequest, LoginRequest, ForgotPasswordRequest, ResetPasswordRequest
 from database.supabase_client import supabase
@@ -95,11 +96,12 @@ async def login(payload: LoginRequest):
 @router.post("/forgot-password")
 async def forgot_password(payload: ForgotPasswordRequest):
     try:
+        frontend_url = os.getenv("FRONTEND_URL", "http://localhost:5173")
         # Supabase reset_password_for_email triggers a reset password email automatically
         supabase.auth.reset_password_for_email(
             payload.email,
             {
-                "redirect_to": "http://localhost:5173/reset-password"
+                "redirect_to": f"{frontend_url}/reset-password"
             }
         )
         return {
