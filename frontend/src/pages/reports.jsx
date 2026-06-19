@@ -36,15 +36,41 @@ export default function ReportsPage() {
         habit_trend: "Habit check-in completion score stabilized at 82%.",
         coach_summary: "Your week was productive and physically active, though stress monitoring suggests keeping work blocks focused and adding small mobility breaks to combat afternoon slump."
       });
+    }
+
+    try {
+      const timelineRes = await api.get(`/timeline/${userId}`);
+      if (timelineRes.data && timelineRes.data.mind_score_trend) {
+        const mindTrend = timelineRes.data.mind_score_trend;
+        const bodyTrend = timelineRes.data.body_score_trend;
+        const lifeTrend = timelineRes.data.lifestyle_score_trend;
+        
+        const mappedHistory = mindTrend.map((score, index) => ({
+          week: `Point ${index + 1}`,
+          Mind: score,
+          Body: bodyTrend[index] || 0,
+          Life: lifeTrend[index] || 0
+        }));
+        
+        if (mappedHistory.length > 0) {
+          setWeeklyHistory(mappedHistory);
+        } else {
+          setWeeklyHistory([
+            { week: "Week 1", Mind: 68, Body: 72, Life: 70 }
+          ]);
+        }
+      } else {
+        setWeeklyHistory([
+          { week: "Week 1", Mind: 68, Body: 72, Life: 70 }
+        ]);
+      }
+    } catch (err) {
+      console.error("Error loading timeline data:", err);
+      setWeeklyHistory([
+        { week: "Week 1", Mind: 68, Body: 72, Life: 70 }
+      ]);
     } finally {
       setLoading(false);
-      // Weekly progress chart mock history
-      setWeeklyHistory([
-        { week: "Week 21", Mind: 68, Body: 72, Life: 70 },
-        { week: "Week 22", Mind: 72, Body: 78, Life: 74 },
-        { week: "Week 23", Mind: 70, Body: 82, Life: 76 },
-        { week: "Week 24", Mind: 75, Body: 88, Life: 83 }
-      ]);
     }
   };
 

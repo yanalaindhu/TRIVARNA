@@ -4,7 +4,7 @@ import Sidebar from "../components/sidebar";
 import ScoreCard from "../components/scorecard";
 import api from "../services/api";
 import { Sparkles, Heart, CheckCircle2, Target, Loader2 } from "lucide-react";
-import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts";
+import { RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, ResponsiveContainer, Tooltip } from "recharts";
 
 export default function LifeOverview() {
   const navigate = useNavigate();
@@ -13,6 +13,7 @@ export default function LifeOverview() {
   const [goals, setGoals] = useState([]);
   const [habits, setHabits] = useState([]);
   const [journals, setJournals] = useState([]);
+  const [radarData, setRadarData] = useState([]);
 
   const userId = localStorage.getItem("userId");
 
@@ -27,6 +28,32 @@ export default function LifeOverview() {
       const dashRes = await api.get(`/dashboard/${userId}`);
       if (dashRes.data) {
         setLifestyleScore(dashRes.data.profile?.lifestyle_score || 0);
+        const onboarding = dashRes.data.onboarding;
+        if (onboarding && onboarding.balance_wheel) {
+          const bw = onboarding.balance_wheel;
+          const mapped = [
+            { subject: "Mental Health", A: (bw.mentalHealth || 5) * 10, fullMark: 100 },
+            { subject: "Physical Health", A: (bw.physicalHealth || 5) * 10, fullMark: 100 },
+            { subject: "Career", A: (bw.career || 5) * 10, fullMark: 100 },
+            { subject: "Relationships", A: (bw.relationships || 5) * 10, fullMark: 100 },
+            { subject: "Personal Growth", A: (bw.personalGrowth || 5) * 10, fullMark: 100 },
+            { subject: "Finances", A: (bw.finances || 5) * 10, fullMark: 100 },
+            { subject: "Leisure & Fun", A: (bw.leisure || 5) * 10, fullMark: 100 },
+            { subject: "Daily Routine", A: (bw.routine || 5) * 10, fullMark: 100 },
+          ];
+          setRadarData(mapped);
+        } else {
+          setRadarData([
+            { subject: "Mental Health", A: 50, fullMark: 100 },
+            { subject: "Physical Health", A: 50, fullMark: 100 },
+            { subject: "Career", A: 50, fullMark: 100 },
+            { subject: "Relationships", A: 50, fullMark: 100 },
+            { subject: "Personal Growth", A: 50, fullMark: 100 },
+            { subject: "Finances", A: 50, fullMark: 100 },
+            { subject: "Leisure & Fun", A: 50, fullMark: 100 },
+            { subject: "Daily Routine", A: 50, fullMark: 100 },
+          ]);
+        }
       }
 
       // Fetch Goals
@@ -63,15 +90,6 @@ export default function LifeOverview() {
     );
   }
 
-  // Pie chart data for Life Balance Wheel
-  const lifeBalanceData = [
-    { name: "Career", value: 70, color: "#ef4444" },
-    { name: "Health & Vitality", value: 80, color: "#10b981" },
-    { name: "Relationships", value: 75, color: "#3b82f6" },
-    { name: "Personal Growth", value: 85, color: "#8b5cf6" },
-    { name: "Fun & Leisure", value: 60, color: "#f59e0b" }
-  ];
-
   return (
     <div className="flex min-h-screen bg-[#f8f8fc] text-gray-800 antialiased">
       <Sidebar />
@@ -105,23 +123,28 @@ export default function LifeOverview() {
             <h3 className="font-extrabold text-gray-800 text-lg mb-4">Life Balance Wheel</h3>
             <div className="h-72">
               <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={lifeBalanceData}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={60}
-                    outerRadius={90}
-                    paddingAngle={5}
-                    dataKey="value"
-                  >
-                    {lifeBalanceData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
-                  </Pie>
+                <RadarChart cx="50%" cy="50%" outerRadius="70%" data={radarData}>
+                  <PolarGrid stroke="#F3F4F6" strokeWidth={1.5} />
+                  <PolarAngleAxis
+                    dataKey="subject"
+                    tick={{ fill: '#4B5563', fontSize: 10, fontWeight: 600 }}
+                  />
+                  <PolarRadiusAxis
+                    angle={30}
+                    domain={[0, 100]}
+                    tick={{ fill: '#9CA3AF', fontSize: 9 }}
+                    axisLine={false}
+                  />
+                  <Radar
+                    name="Balance Score"
+                    dataKey="A"
+                    stroke="#8b5cf6"
+                    strokeWidth={2}
+                    fill="#a78bfa"
+                    fillOpacity={0.4}
+                  />
                   <Tooltip formatter={(value) => `${value}%`} />
-                  <Legend verticalAlign="bottom" height={36} />
-                </PieChart>
+                </RadarChart>
               </ResponsiveContainer>
             </div>
           </div>

@@ -12,7 +12,7 @@ export default function Home() {
         playsInline
         className="absolute inset-0 h-full w-full object-cover"
       >
-        <source src="/videos/trivarna-bg.mp4" type="video/mp4" />
+        <source src="/videos/trivarna_bg.mp4" type="video/mp4" />
       </video>
 
       {/* Dark Overlay */}
@@ -21,18 +21,7 @@ export default function Home() {
       {/* Content */}
       <div className="relative z-10 flex h-full flex-col items-center justify-center px-8 text-center">
 
-        {/* Logo */}
-        <div className="mb-8">
 
-          <h1 className="text-5xl font-bold tracking-wider text-white">
-            TRIVARNA
-          </h1>
-
-          <p className="mt-2 text-lg text-white/90">
-            Mind • Body • Lifestyle
-          </p>
-
-        </div>
 
         {/* Tagline */}
         <div className="max-w-sm">

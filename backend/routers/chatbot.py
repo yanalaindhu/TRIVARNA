@@ -101,8 +101,21 @@ async def query_rag(payload: QueryRequest, authorization: str = Header(None)):
         USER QUESTION:
         {payload.prompt}
         
+        CRITICAL RULES FOR RECOMMENDATIONS:
+        1. If the user mentions not sleeping well, insomnia, or sleep issues ("I can't sleep well", "having trouble sleeping", etc.), you MUST suggest relaxing sleep music using exactly these YouTube links:
+           - [Deep Sleep Music (YouTube)](https://www.youtube.com/watch?v=Wnn47ObA8Gs)
+           - [Rain Sounds for Sleep (YouTube)](https://www.youtube.com/watch?v=q76bMs-NwRk)
+           - [8-Hour Sleep & Relaxation Music (YouTube)](https://www.youtube.com/watch?v=jfKfPfyJRdk)
+           Explain that listening to this music helps them sleep peacefully and calm their mind.
+        2. If the user mentions being bored ("I am bored", "boredom", "suggest something to do"), you MUST suggest playing interesting web games or reading articles/stories:
+           - Play a game: [Chess on Chess.com](https://www.chess.com) or [Sudoku on WebSudoku](https://www.websudoku.com)
+           - Read interesting short stories on [Medium](https://medium.com) or relaxing articles on [Trivarna Life Blog](https://trivarnalife.com)
+        3. If the user mentions being sad, down, or not in a good mood ("I am sad", "not in a good mood", "feeling low", "depressed"), you MUST suggest funny comedy video links or tell them a joke:
+           - Watch funny comedy clips: [Mr. Bean Classic Comedy (YouTube)](https://www.youtube.com/watch?v=2K8Tgt5zTVE) or [Funny Animal Clips (YouTube)](https://www.youtube.com/watch?v=tntOCGkgt98)
+           - Tell them a joke: e.g. "Why don't scientists trust atoms? Because they make up everything!"
+        
         INSTRUCTIONS:
-        1. Formulate an extremely personalized, structured response based ONLY on the provided context data.
+        1. Formulate an extremely personalized, structured response based ONLY on the provided context data and the rules above.
         2. Keep the tone warm, highly scientific, and motivating.
         3. Do not mention "database tables", "JSON", "columns", or technical database terms. Refer to their logs as "your daily check-ins", "your journal", or "your logged progress".
         4. If the context does not contain enough data, answer the question generally while asking the user to log more details.

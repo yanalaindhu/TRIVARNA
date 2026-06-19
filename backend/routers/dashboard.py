@@ -54,7 +54,23 @@ async def get_dashboard(user_id: str):
             .execute()
         )
 
+        latest_scores = (
+            supabase
+            .table("trivarna_scores")
+            .select("*")
+            .eq("user_id", user_id)
+            .order("created_at", desc=True)
+            .limit(1)
+            .execute()
+        )
+
         profile_data = latest_profile.data[0] if latest_profile.data else {}
+
+        if latest_scores.data:
+            profile_data["mind_score"] = latest_scores.data[0].get("mind_score", profile_data.get("mind_score"))
+            profile_data["body_score"] = latest_scores.data[0].get("body_score", profile_data.get("body_score"))
+            profile_data["lifestyle_score"] = latest_scores.data[0].get("lifestyle_score", profile_data.get("lifestyle_score"))
+            profile_data["overall_score"] = latest_scores.data[0].get("overall_score", profile_data.get("overall_score"))
 
         # Fetch basic profiles info (name, age, occupation)
         user_profile_res = (

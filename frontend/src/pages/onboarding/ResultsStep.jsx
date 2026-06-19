@@ -134,35 +134,19 @@ export default function ResultsStep({ onNext, onBack }) {
           </div>
         </div>
 
-        {/* Strengths and Risks Lists */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4">
-          <div className="space-y-3">
-            <h4 className="text-sm font-bold uppercase tracking-wider text-success-green flex items-center space-x-1">
-              <span>👍 Key Strengths</span>
-            </h4>
-            <ul className="space-y-2">
-              {strengths.map((str, idx) => (
-                <li key={idx} className="text-sm text-text-primary flex items-start space-x-2.5">
-                  <span className="text-success-green font-bold text-base leading-none">•</span>
-                  <span>{str}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div className="space-y-3">
-            <h4 className="text-sm font-bold uppercase tracking-wider text-danger-red flex items-center space-x-1">
-              <span>⚠️ Potential Risks</span>
-            </h4>
-            <ul className="space-y-2">
-              {risks.map((risk, idx) => (
-                <li key={idx} className="text-sm text-text-primary flex items-start space-x-2.5">
-                  <span className="text-danger-red font-bold text-base leading-none">•</span>
-                  <span>{risk}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
+        {/* Recommendations List */}
+        <div className="pt-4 space-y-3">
+          <h4 className="text-sm font-bold uppercase tracking-wider text-primary-purple flex items-center space-x-1">
+            <span>🌿 AI Recommendations</span>
+          </h4>
+          <ul className="space-y-2">
+            {focusAreas && focusAreas.map((rec, idx) => (
+              <li key={idx} className="text-sm text-text-primary flex items-start space-x-2.5">
+                <span className="text-primary-purple font-bold text-base leading-none">•</span>
+                <span>{rec}</span>
+              </li>
+            ))}
+          </ul>
         </div>
       </div>
 

@@ -368,7 +368,7 @@ export default function Dashboard() {
 
                   <TrendCard 
                     title="Activity" 
-                    value={latestCheckin?.exercise_minutes ? `${latestCheckin.exercise_minutes * 100} steps` : "8,245 steps"} 
+                    value={latestCheckin?.exercise_minutes ? `${latestCheckin.exercise_minutes * 100}` : "8,245"} 
                     status={latestCheckin?.exercise_minutes ? (latestCheckin.exercise_minutes >= 30 ? "Active" : "Light") : "Active"}
                     color="#10b981" 
                     data={getTrendData('activity', defaultActivityPoints)} 

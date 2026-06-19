@@ -36,6 +36,18 @@ export default function GoalsPage() {
   const handleAddGoal = async (e) => {
     e.preventDefault();
     if (!newGoal.goal_name || !newGoal.target_date) return;
+    
+    // Validate target date is not in the past
+    const selectedDate = new Date(newGoal.target_date);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    selectedDate.setHours(0, 0, 0, 0);
+    
+    if (selectedDate < today) {
+      alert("Target deadline cannot be a past date. Please select today or a future date.");
+      return;
+    }
+
     setAddingGoal(true);
     try {
       const payload = {
@@ -148,6 +160,7 @@ export default function GoalsPage() {
                   <input
                     type="date"
                     value={newGoal.target_date}
+                    min={new Date().toLocaleDateString('en-CA')}
                     onChange={(e) => setNewGoal(prev => ({ ...prev, target_date: e.target.value }))}
                     className="border border-gray-200 rounded-xl px-4 py-2 text-sm outline-none focus:border-purple-500 bg-gray-50/50"
                     required

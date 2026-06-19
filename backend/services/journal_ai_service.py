@@ -3,6 +3,17 @@ import json
 
 
 def analyze_journal(text: str):
+    cleaned = text.strip().lower()
+    # Handle simple greetings and short/empty logs programmatically
+    greetings_words = {"hi", "hello", "hey", "yo", "hola", "test", "greetings", "sup", "good morning", "good evening", "good afternoon"}
+    words = [w.strip(".,!?") for w in cleaned.split()]
+    if not words or (len(words) <= 2 and all(w in greetings_words for w in words)) or len(cleaned) < 3:
+        return {
+            "emotion": "Neutral",
+            "sentiment_score": 50.0,
+            "stress_level": 0,
+            "summary": "Logged greeting. Write a longer entry about your day to analyze your wellbeing insights."
+        }
 
     prompt = f"""
     Analyze this journal entry.
@@ -15,7 +26,7 @@ def analyze_journal(text: str):
     {{
       "emotion": "",
       "sentiment_score": 0,
-      "stress_level": "",
+      "stress_level": 0,
       "summary": ""
     }}
     """

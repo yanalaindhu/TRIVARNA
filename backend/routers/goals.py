@@ -16,6 +16,17 @@ router = APIRouter(
 async def create_goal(payload: GoalCreate):
 
     try:
+        from datetime import datetime, date
+        if payload.target_date:
+            try:
+                target_dt = datetime.strptime(payload.target_date, "%Y-%m-%d").date()
+                if target_dt < date.today():
+                    raise HTTPException(
+                        status_code=400,
+                        detail="Target deadline date cannot be in the past."
+                    )
+            except ValueError:
+                pass
 
         data = payload.model_dump(
             mode="json"
