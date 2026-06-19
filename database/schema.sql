@@ -6,6 +6,7 @@ CREATE TABLE profiles (
     full_name TEXT,
     age INT,
     occupation TEXT,
+    avatar_url TEXT,
 
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
@@ -215,4 +216,14 @@ CREATE TABLE ai_plans (
     sleep_target VARCHAR(20) NOT NULL,
     schedule JSONB NOT NULL,
     generated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Future Self Predictions Table
+CREATE TABLE future_self_predictions (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+    prediction_30_days TEXT NOT NULL,
+    prediction_90_days TEXT NOT NULL,
+    prediction_1_year TEXT NOT NULL,
+    created_at TIMESTAMPTZ DEFAULT NOW()
 );
