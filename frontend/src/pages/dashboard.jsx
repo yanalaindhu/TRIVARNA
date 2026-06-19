@@ -332,9 +332,9 @@ export default function Dashboard() {
                     status={getScoreRating(profile.body_score || 88)} 
                   />
 
-                  {/* Soul/Lifestyle Score */}
+                  {/* Life/Lifestyle Score */}
                   <CircularProgress 
-                    label="Soul Score" 
+                    label="Life Score" 
                     score={profile.lifestyle_score || 83} 
                     color="orange" 
                     status={getScoreRating(profile.lifestyle_score || 83)} 

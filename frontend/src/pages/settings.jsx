@@ -9,7 +9,9 @@ export default function Settings() {
   const resetOnboarding = useOnboardingStore((state) => state.resetOnboarding);
 
   const [notification, setNotification] = useState(true);
-  const [darkMode, setDarkMode] = useState(false);
+  const [darkMode, setDarkMode] = useState(() => {
+    return localStorage.getItem("darkMode") === "true";
+  });
   const [metricUnits, setMetricUnits] = useState(true);
   
   const [connections, setConnections] = useState({
@@ -23,6 +25,17 @@ export default function Settings() {
       ...prev,
       [app]: !prev[app],
     }));
+  };
+
+  const handleToggleDarkMode = () => {
+    const nextDark = !darkMode;
+    setDarkMode(nextDark);
+    localStorage.setItem("darkMode", String(nextDark));
+    if (nextDark) {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
   };
 
   const handleLogout = () => {
@@ -89,7 +102,7 @@ export default function Settings() {
                   <p className="text-[10px] text-gray-400">Enable dark theme aesthetics.</p>
                 </div>
                 <button
-                  onClick={() => setDarkMode(!darkMode)}
+                  onClick={handleToggleDarkMode}
                   className={`w-12 h-6 rounded-full p-1 transition-colors duration-200 cursor-pointer ${
                     darkMode ? "bg-purple-600" : "bg-gray-300"
                   }`}
@@ -139,7 +152,7 @@ export default function Settings() {
                     navigate("/onboarding");
                   }
                 }}
-                className="px-4 py-2 bg-purple-600 hover:bg-purple-750 text-white text-xs font-bold rounded-xl transition cursor-pointer shadow-sm"
+                className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold rounded-xl hover:shadow-lg hover:shadow-purple-600/30 transition-all duration-300 cursor-pointer shadow-md shadow-purple-600/20 hover:-translate-y-[1px]"
               >
                 Retake Assessment
               </button>
@@ -215,7 +228,7 @@ export default function Settings() {
             <span className="text-xs text-gray-400">Active session: {localStorage.getItem("email")}</span>
             <button
               onClick={handleLogout}
-              className="flex items-center gap-2 bg-red-50 text-red-600 border border-red-100 hover:bg-red-100 text-xs font-bold px-4 py-2.5 rounded-xl transition cursor-pointer shadow-sm"
+              className="flex items-center gap-2 bg-red-50 text-red-600 border border-red-100 hover:bg-red-100 text-xs font-bold px-4 py-2.5 rounded-xl hover:shadow-md hover:shadow-red-500/10 transition-all duration-300 cursor-pointer shadow-sm hover:-translate-y-[1px]"
             >
               <LogOut className="w-4 h-4" />
               <span>Log Out Account</span>

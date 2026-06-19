@@ -157,7 +157,7 @@ export default function HabitsPage() {
                   >
                     <option value="Mind">Mind Wellbeing</option>
                     <option value="Body">Body Tracker</option>
-                    <option value="Lifestyle">Soul & Lifestyle</option>
+                    <option value="Lifestyle">Life & Lifestyle</option>
                   </select>
                 </div>
 

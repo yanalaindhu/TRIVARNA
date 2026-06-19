@@ -6,7 +6,7 @@ import api from "../services/api";
 import { Sparkles, Heart, CheckCircle2, Target, Loader2 } from "lucide-react";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts";
 
-export default function SoulOverview() {
+export default function LifeOverview() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [lifestyleScore, setLifestyleScore] = useState(0);
@@ -16,7 +16,7 @@ export default function SoulOverview() {
 
   const userId = localStorage.getItem("userId");
 
-  const loadSoulData = async () => {
+  const loadLifeData = async () => {
     if (!userId) {
       navigate("/login");
       return;
@@ -42,14 +42,14 @@ export default function SoulOverview() {
       setJournals(journalsRes.data || []);
 
     } catch (err) {
-      console.error("Error loading soul overview data:", err);
+      console.error("Error loading life overview data:", err);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    loadSoulData();
+    loadLifeData();
   }, [userId]);
 
   if (loading && goals.length === 0 && habits.length === 0) {
@@ -57,7 +57,7 @@ export default function SoulOverview() {
       <div className="flex min-h-screen bg-[#f8f8fc] justify-center items-center">
         <div className="flex flex-col items-center gap-2">
           <Loader2 className="w-8 h-8 text-purple-600 animate-spin" />
-          <p className="text-gray-500 font-semibold text-sm">Loading Lifestyle Dynamics...</p>
+          <p className="text-gray-500 font-semibold text-sm">Loading Life Dynamics...</p>
         </div>
       </div>
     );
@@ -82,7 +82,7 @@ export default function SoulOverview() {
           <div>
             <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight flex items-center gap-2">
               <Sparkles className="w-8 h-8 text-purple-600" />
-              Soul & Lifestyle Overview
+              Life & Lifestyle Overview
             </h1>
             <p className="text-gray-500 text-sm mt-1">
               Synchronize your long-term personal goals, habit streaks, and life balance coefficients.

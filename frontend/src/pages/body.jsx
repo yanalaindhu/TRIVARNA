@@ -7,6 +7,7 @@ import { Activity, Dumbbell, Moon, Soup, Plus, Loader2, Sparkles } from "lucide-
 import { BarChart, Bar, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 
 export default function BodyOverview() {
+  const userId = localStorage.getItem("userId");
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("fitness"); // fitness, sleep, nutrition
@@ -14,15 +15,18 @@ export default function BodyOverview() {
   const [latestCheckin, setLatestCheckin] = useState(null);
   
   // Nutrition-specific state
-  const [meals, setMeals] = useState([
-    { name: "Oatmeal with fruits", type: "Breakfast", calories: 450 },
-    { name: "Grilled chicken, rice, salad", type: "Lunch", calories: 600 },
-    { name: "Quinoa, vegetables, paneer", type: "Dinner", calories: 480 },
-    { name: "Nuts, banana", type: "Snack", calories: 200 }
-  ]);
+  const [meals, setMeals] = useState(() => {
+    const saved = localStorage.getItem(`meals_${userId}`);
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch (e) {
+        console.error("Failed to parse meals:", e);
+      }
+    }
+    return [];
+  });
   const [newMeal, setNewMeal] = useState({ name: "", type: "Breakfast", calories: "" });
-  
-  const userId = localStorage.getItem("userId");
 
   const loadBodyData = async () => {
     if (!userId) {
@@ -58,14 +62,16 @@ export default function BodyOverview() {
   const handleAddMeal = (e) => {
     e.preventDefault();
     if (!newMeal.name || !newMeal.calories) return;
-    setMeals((prev) => [
-      ...prev,
+    const updatedMeals = [
+      ...meals,
       {
         name: newMeal.name,
         type: newMeal.type,
         calories: parseInt(newMeal.calories)
       }
-    ]);
+    ];
+    setMeals(updatedMeals);
+    localStorage.setItem(`meals_${userId}`, JSON.stringify(updatedMeals));
     setNewMeal({ name: "", type: "Breakfast", calories: "" });
   };
 
@@ -80,11 +86,22 @@ export default function BodyOverview() {
     );
   }
 
-  // Calculate stats
-  const totalExercise = latestCheckin?.exercise_minutes || 0;
-  const totalSleep = latestCheckin?.sleep_hours || 0;
-  const totalWater = latestCheckin?.water_intake || 0;
+  // Verify if the latest check-in was recorded today
+  const checkinDate = latestCheckin?.created_at ? new Date(latestCheckin.created_at) : null;
+  const isCheckinToday = checkinDate ? new Date().toDateString() === checkinDate.toDateString() : false;
+
+  const totalExercise = isCheckinToday ? (latestCheckin?.exercise_minutes || 0) : 0;
+  const totalSleep = isCheckinToday ? (latestCheckin?.sleep_hours || 0) : 0;
+  const totalWater = isCheckinToday ? (latestCheckin?.water_intake || 0) : 0;
   
+  const estimatedSteps = totalExercise > 0 ? (totalExercise * 120 + 2000) : 0;
+  const distanceCovered = estimatedSteps > 0 ? (estimatedSteps * 0.00075).toFixed(1) : "0.0";
+
+  const sleepLogged = isCheckinToday && latestCheckin && latestCheckin.sleep_hours !== undefined && latestCheckin.sleep_hours !== null;
+  const sleepDisplay = sleepLogged ? `${totalSleep} hrs` : "No data";
+  const sleepScoreDisplay = sleepLogged ? (totalSleep > 7 ? "92%" : totalSleep > 5 ? "78%" : "54%") : "No data";
+  const sleepEfficiencyDisplay = sleepLogged ? "88%" : "No data";
+
   // Nutrition calculations
   const totalCalories = meals.reduce((sum, m) => sum + m.calories, 0);
   const targetCalories = 2200;
@@ -159,12 +176,12 @@ export default function BodyOverview() {
               </div>
               <div className="bg-white p-5 rounded-3xl shadow-sm border border-gray-100/50 flex flex-col justify-between">
                 <span className="text-gray-400 text-[10px] font-bold uppercase">Estimated Steps</span>
-                <span className="text-3xl font-extrabold mt-2 text-emerald-600">8,245</span>
+                <span className="text-3xl font-extrabold mt-2 text-emerald-600">{estimatedSteps.toLocaleString()}</span>
                 <span className="text-[10px] text-gray-500 mt-1">Goal: 10,000 steps</span>
               </div>
               <div className="bg-white p-5 rounded-3xl shadow-sm border border-gray-100/50 flex flex-col justify-between">
                 <span className="text-gray-400 text-[10px] font-bold uppercase">Distance Covered</span>
-                <span className="text-3xl font-extrabold mt-2 text-blue-600">6.2 km</span>
+                <span className="text-3xl font-extrabold mt-2 text-blue-600">{distanceCovered} km</span>
                 <span className="text-[10px] text-gray-500 mt-1">Based on step cadence</span>
               </div>
               <div className="bg-white p-5 rounded-3xl shadow-sm border border-gray-100/50 flex flex-col justify-between">
@@ -204,19 +221,19 @@ export default function BodyOverview() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="bg-white p-5 rounded-3xl shadow-sm border border-gray-100/50">
                 <h4 className="text-gray-400 text-[10px] font-bold uppercase mb-2">Sleep Duration</h4>
-                <p className="text-3xl font-extrabold text-purple-600">{totalSleep} hrs</p>
+                <p className="text-3xl font-extrabold text-purple-600">{sleepDisplay}</p>
                 <p className="text-[10px] text-gray-500 mt-1">Recommended: 7-9 hours</p>
               </div>
 
               <div className="bg-white p-5 rounded-3xl shadow-sm border border-gray-100/50">
                 <h4 className="text-gray-400 text-[10px] font-bold uppercase mb-2">Sleep Score</h4>
-                <p className="text-3xl font-extrabold text-emerald-600">{totalSleep > 7 ? "92%" : totalSleep > 5 ? "78%" : "54%"}</p>
+                <p className="text-3xl font-extrabold text-emerald-600">{sleepScoreDisplay}</p>
                 <p className="text-[10px] text-gray-500 mt-1">Calculated via rest stability</p>
               </div>
 
               <div className="bg-white p-5 rounded-3xl shadow-sm border border-gray-100/50">
                 <h4 className="text-gray-400 text-[10px] font-bold uppercase mb-2">Sleep Efficiency</h4>
-                <p className="text-3xl font-extrabold text-blue-600">88%</p>
+                <p className="text-3xl font-extrabold text-blue-600">{sleepEfficiencyDisplay}</p>
                 <p className="text-[10px] text-gray-500 mt-1">Percentage of time actually asleep</p>
               </div>
             </div>

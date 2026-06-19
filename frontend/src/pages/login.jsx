@@ -169,7 +169,7 @@ export default function Login() {
 
           <button
             type="submit"
-            className="w-full py-3 rounded-xl text-white font-semibold bg-gradient-to-r from-purple-500 to-pink-400 hover:opacity-90 transition"
+            className="w-full py-3 rounded-xl text-white font-semibold bg-gradient-to-r from-purple-500 to-pink-400 hover:opacity-90 hover:shadow-lg hover:shadow-purple-500/30 transition-all duration-300 shadow-md shadow-purple-500/20 hover:-translate-y-[1px]"
           >
             Login →
           </button>

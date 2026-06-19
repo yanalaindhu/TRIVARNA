@@ -65,7 +65,7 @@ export default function Sidebar() {
       items: [
         { name: "Mind Overview", path: "/mind", icon: Brain },
         { name: "Body Tracker", path: "/body", icon: Activity },
-        { name: "Soul & Habits", path: "/soul", icon: Sparkles },
+        { name: "Life & Habits", path: "/life", icon: Sparkles },
       ]
     },
     {

@@ -131,7 +131,7 @@ export default function Onboarding() {
       {/* 3. Global Footer */}
       <footer className="bg-white/70 backdrop-blur-md border-t border-white/20 py-4 text-center text-xs text-gray-500 font-medium">
         <div className="max-w-6xl mx-auto px-6">
-          © {new Date().getFullYear()} TRIVARNA. All rights reserved. • Mind • Body • Soul Alignment System
+          © {new Date().getFullYear()} TRIVARNA. All rights reserved. • Mind • Body • Life Alignment System
         </div>
       </footer>
     </div>

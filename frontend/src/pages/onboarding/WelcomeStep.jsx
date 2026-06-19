@@ -21,7 +21,7 @@ export default function WelcomeStep({ onNext }) {
         </h1>
         
         <p className="text-lg md:text-xl font-semibold text-secondary-purple tracking-widest uppercase text-xs">
-          Mind 🧠 • Body 💪 • Soul ✨
+          Mind 🧠 • Body 💪 • Life 🌱
         </p>
       </div>
 

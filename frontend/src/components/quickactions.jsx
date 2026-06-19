@@ -28,7 +28,7 @@ export default function QuickActions({ onOpenCheckin }) {
       label: "Log Journal Reflection",
       icon: BookOpen,
       color: "bg-amber-50 text-amber-600 hover:bg-amber-100",
-      onClick: () => navigate("/soul"),
+      onClick: () => navigate("/life"),
     },
   ];
 

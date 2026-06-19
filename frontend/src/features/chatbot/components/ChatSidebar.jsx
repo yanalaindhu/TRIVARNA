@@ -3,7 +3,7 @@ import ModelSelector from './ModelSelector';
 import DatabasePanel from './DatabasePanel';
 import { useChatbotStore } from '../store/chatbotStore';
 import { RAG_MODELS } from '../data/ragModels';
-import { Compass, Info, RefreshCw } from 'lucide-react';
+import { Info, RefreshCw } from 'lucide-react';
 
 export default function ChatSidebar() {
   const { selectedModel, clearHistory } = useChatbotStore();
@@ -15,9 +15,11 @@ export default function ChatSidebar() {
       <div className="p-4 border-b border-gray-100 bg-white">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2.5">
-            <div className="w-8 h-8 bg-light-purple text-primary-purple border border-primary-purple/20 rounded-xl flex items-center justify-center shadow-inner">
-              <Compass className="w-4.5 h-4.5 stroke-[2] animate-spin-slow" />
-            </div>
+            <img
+              src="/logo.png"
+              alt="Trivarna AI Logo"
+              className="w-8 h-8 object-contain"
+            />
             <span className="font-extrabold text-text-primary text-base tracking-tight">
               TRIVARNA AI
             </span>

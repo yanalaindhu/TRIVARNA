@@ -213,7 +213,7 @@ export default function Profile() {
                 {editing ? (
                   <button
                     onClick={handleSave}
-                    className="flex items-center justify-center gap-2 bg-purple-600 hover:bg-purple-750 text-white text-xs font-bold px-4 py-2.5 rounded-xl transition cursor-pointer w-full shadow-md"
+                    className="flex items-center justify-center gap-2 bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold px-4 py-2.5 rounded-xl hover:shadow-lg hover:shadow-purple-600/30 transition-all duration-300 cursor-pointer w-full shadow-md shadow-purple-600/20 hover:-translate-y-[1px]"
                   >
                     <Save className="w-4 h-4" />
                     <span>Save Changes</span>
@@ -222,7 +222,7 @@ export default function Profile() {
                   <div className="space-y-2.5 w-full">
                     <button
                       onClick={() => setEditing(true)}
-                      className="flex items-center justify-center gap-2 border border-purple-200 hover:bg-purple-50 text-purple-600 text-xs font-bold px-4 py-2.5 rounded-xl transition cursor-pointer w-full"
+                      className="flex items-center justify-center gap-2 border border-purple-200 hover:bg-purple-50 text-purple-600 text-xs font-bold px-4 py-2.5 rounded-xl hover:shadow-md hover:shadow-purple-600/10 transition-all duration-300 cursor-pointer w-full hover:-translate-y-[1px]"
                     >
                       <Edit3 className="w-4 h-4" />
                       <span>Edit Profile Details</span>

@@ -2,7 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import ChatSidebar from './components/ChatSidebar';
 import ChatWindow from './components/ChatWindow';
-import { Compass, ArrowLeft } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 
 export default function Chatbot() {
   const navigate = useNavigate();
@@ -14,9 +14,11 @@ export default function Chatbot() {
         <div className="max-w-6xl mx-auto flex items-center justify-between">
           {/* Brand Logo */}
           <div className="flex items-center space-x-2.5 cursor-pointer" onClick={() => navigate('/dashboard')}>
-            <div className="w-9 h-9 bg-light-purple text-primary-purple border border-primary-purple/20 rounded-xl flex items-center justify-center shadow-inner">
-              <Compass className="w-5 h-5 stroke-[2]" />
-            </div>
+            <img
+              src="/logo.png"
+              alt="Trivarna Logo"
+              className="w-9 h-9 object-contain"
+            />
             <span className="text-xl font-black text-text-primary tracking-tight">
               TRIVARNA
             </span>

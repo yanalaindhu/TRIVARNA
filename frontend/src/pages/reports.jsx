@@ -40,10 +40,10 @@ export default function ReportsPage() {
       setLoading(false);
       // Weekly progress chart mock history
       setWeeklyHistory([
-        { week: "Week 21", Mind: 68, Body: 72, Soul: 70 },
-        { week: "Week 22", Mind: 72, Body: 78, Soul: 74 },
-        { week: "Week 23", Mind: 70, Body: 82, Soul: 76 },
-        { week: "Week 24", Mind: 75, Body: 88, Soul: 83 }
+        { week: "Week 21", Mind: 68, Body: 72, Life: 70 },
+        { week: "Week 22", Mind: 72, Body: 78, Life: 74 },
+        { week: "Week 23", Mind: 70, Body: 82, Life: 76 },
+        { week: "Week 24", Mind: 75, Body: 88, Life: 83 }
       ]);
     }
   };
@@ -53,7 +53,7 @@ export default function ReportsPage() {
   }, [userId]);
 
   const handleDownloadPDF = () => {
-    alert("Compiling wellbeing metrics... Your PDF report will download automatically.");
+    window.print();
   };
 
   if (loading && !report) {
@@ -87,7 +87,7 @@ export default function ReportsPage() {
 
           <button
             onClick={handleDownloadPDF}
-            className="flex items-center gap-2 bg-gradient-to-r from-purple-600 to-pink-500 text-white font-bold text-xs px-5 py-2.5 rounded-xl shadow-md hover:opacity-95 transition cursor-pointer"
+            className="flex items-center gap-2 bg-gradient-to-r from-purple-600 to-pink-500 text-white font-bold text-xs px-5 py-2.5 rounded-xl hover:shadow-lg hover:shadow-purple-600/30 transition-all duration-300 cursor-pointer shadow-md shadow-purple-500/20 hover:-translate-y-[1px]"
           >
             <Download className="w-4 h-4" />
             <span>Download PDF Report</span>
@@ -131,7 +131,7 @@ export default function ReportsPage() {
                   <Tooltip />
                   <Bar dataKey="Mind" fill="#8b5cf6" radius={[4, 4, 0, 0]} />
                   <Bar dataKey="Body" fill="#10b981" radius={[4, 4, 0, 0]} />
-                  <Bar dataKey="Soul" fill="#f59e0b" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="Life" fill="#f59e0b" radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
