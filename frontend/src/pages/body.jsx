@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import Sidebar from "../components/sidebar";
 import ScoreCard from "../components/scorecard";
 import api from "../services/api";
-import { Activity, Dumbbell, Moon, Soup, Plus, Loader2, Sparkles } from "lucide-react";
+import { Activity, Dumbbell, Moon, Soup, Plus, Loader2, Sparkles, Flame } from "lucide-react";
 import { BarChart, Bar, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 
 export default function BodyOverview() {
@@ -13,15 +13,30 @@ export default function BodyOverview() {
   const [activeTab, setActiveTab] = useState("fitness"); // fitness, sleep, nutrition
   const [checkins, setCheckins] = useState([]);
   const [latestCheckin, setLatestCheckin] = useState(null);
+  const [onboarding, setOnboarding] = useState(null);
+
+  const todayStr = new Date().toDateString();
+  const yesterdayStr = new Date(Date.now() - 86400000).toDateString();
   
   // Nutrition-specific state
   const [meals, setMeals] = useState(() => {
-    const saved = localStorage.getItem(`meals_${userId}`);
-    if (saved) {
+    const savedToday = localStorage.getItem(`meals_${userId}_${todayStr}`);
+    if (savedToday) {
       try {
-        return JSON.parse(saved);
+        return JSON.parse(savedToday);
       } catch (e) {
         console.error("Failed to parse meals:", e);
+      }
+    }
+    // Migration: if there is old data, treat it as today's meals
+    const savedOld = localStorage.getItem(`meals_${userId}`);
+    if (savedOld) {
+      try {
+        const parsed = JSON.parse(savedOld);
+        localStorage.setItem(`meals_${userId}_${todayStr}`, savedOld);
+        return parsed;
+      } catch (e) {
+        console.error("Failed to parse old meals:", e);
       }
     }
     return [];
@@ -38,6 +53,7 @@ export default function BodyOverview() {
       const dashRes = await api.get(`/dashboard/${userId}`);
       if (dashRes.data) {
         setLatestCheckin(dashRes.data.latest_checkin || {});
+        setOnboarding(dashRes.data.onboarding || null);
       }
 
       const checkinsRes = await api.get(`/checkins/${userId}`);
@@ -71,7 +87,7 @@ export default function BodyOverview() {
       }
     ];
     setMeals(updatedMeals);
-    localStorage.setItem(`meals_${userId}`, JSON.stringify(updatedMeals));
+    localStorage.setItem(`meals_${userId}_${todayStr}`, JSON.stringify(updatedMeals));
     setNewMeal({ name: "", type: "Breakfast", calories: "" });
   };
 
@@ -104,8 +120,88 @@ export default function BodyOverview() {
 
   // Nutrition calculations
   const totalCalories = meals.reduce((sum, m) => sum + m.calories, 0);
-  const targetCalories = 2200;
+
+  // Dynamic calorie target based on onboarding activity level
+  const activityLevel = onboarding?.body_data?.activity || "moderately_active";
+  const targetCalories = activityLevel === "sedentary" ? 1800 
+                       : activityLevel === "lightly_active" ? 2000 
+                       : activityLevel === "moderately_active" ? 2200 
+                       : activityLevel === "very_active" ? 2500 
+                       : 2200;
+
   const caloriePercent = Math.min((totalCalories / targetCalories) * 100, 100);
+
+  const getDynamicSleepInsights = () => {
+    if (!sleepLogged) {
+      return {
+        title: "No Sleep Data Recorded",
+        desc: "Please log your sleep hours in today's check-in to get custom sleep hygiene advice.",
+        tips: [
+          "Complete your daily check-in",
+          "Aim for regular sleep onset window (approx. 10:30 PM)",
+          "Avoid screen usage 30 mins before sleep"
+        ]
+      };
+    }
+    if (totalSleep >= 8) {
+      return {
+        title: "Excellent Sleep Duration",
+        desc: `You logged ${totalSleep} hours of sleep today. This is within the optimal zone of recovery for physical and cognitive restoration. Keep it up!`,
+        tips: [
+          "Maintain your sleep consistency over the weekend",
+          "Make sure your room remains cool and pitch-black",
+          "Log your morning energy level to track sleep quality"
+        ]
+      };
+    } else if (totalSleep >= 7) {
+      return {
+        title: "Sufficient Sleep Duration",
+        desc: `You logged ${totalSleep} hours of sleep. This meets the minimum threshold for healthy recovery, supporting full daily performance.`,
+        tips: [
+          "Keep screens away 30 minutes before sleep",
+          "Avoid large meals within 2 hours of sleeping",
+          "Expose yourself to sunlight within 1 hour of waking"
+        ]
+      };
+    } else if (totalSleep >= 5) {
+      return {
+        title: "Mild Sleep Deprivation Detected",
+        desc: `You only logged ${totalSleep} hours of sleep. This is below the recommended 7-9 hours, which can cause cognitive fatigue, reduced focus, and elevated stress.`,
+        tips: [
+          "Avoid double-shot espresso or caffeine blocks after 2:00 PM",
+          "Consider a short 15-20 min power nap before 3:00 PM",
+          "Go to bed 30 minutes earlier tonight"
+        ]
+      };
+    } else {
+      return {
+        title: "Critical Sleep Deficit Detected",
+        desc: `Warning: You logged only ${totalSleep} hours of sleep. This is a severe sleep deficit. Your immune function, hormonal balance, and focus are significantly impaired.`,
+        tips: [
+          "Do not engage in heavy or hazardous physical work today",
+          "Listen to our healing playlist to calm your nervous system",
+          "Prioritize getting back to bed early tonight"
+        ]
+      };
+    }
+  };
+
+  const sleepInsights = getDynamicSleepInsights();
+
+  // Yesterday's calories and recommendations
+  const yesterdayMeals = (() => {
+    const saved = localStorage.getItem(`meals_${userId}_${yesterdayStr}`);
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch (e) {
+        return [];
+      }
+    }
+    return [];
+  })();
+  const yesterdayCalories = yesterdayMeals.reduce((sum, m) => sum + m.calories, 0);
+  const yesterdayExcess = yesterdayCalories > targetCalories ? yesterdayCalories - targetCalories : 0;
 
   // Sleep stages mock data for chart
   const sleepStagesData = [
@@ -167,22 +263,42 @@ export default function BodyOverview() {
         {/* Dynamic Content */}
         {activeTab === "fitness" && (
           <div className="space-y-8 animate-in fade-in duration-200">
+            {yesterdayExcess > 0 && (
+              <div className="bg-gradient-to-r from-amber-50 to-orange-50 border border-orange-200 rounded-3xl p-6 shadow-sm flex items-start gap-4 animate-in fade-in slide-in-from-top-4 duration-300">
+                <div className="p-3 bg-orange-100 text-orange-600 rounded-2xl">
+                  <Flame className="w-6 h-6 animate-pulse" />
+                </div>
+                <div className="flex-1">
+                  <h4 className="font-extrabold text-orange-900 text-base">Yesterday's Calorie Balance Recommendation</h4>
+                  <p className="text-orange-700 text-sm mt-1 font-medium">
+                    You consumed <strong>{yesterdayCalories} kcal</strong> yesterday, which exceeded your daily target of <strong>{targetCalories} kcal</strong> by <strong>{yesterdayExcess} kcal</strong>. To balance it out, we recommend performing one of the following activities today:
+                  </p>
+                  <div className="mt-4 bg-white/70 backdrop-blur-sm rounded-2xl p-4 border border-orange-100/50">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs text-gray-700 font-semibold">
+                      <div className="flex items-center gap-2">
+                        <span className="w-2.5 h-2.5 rounded-full bg-orange-500"></span>
+                        <span>🏃 Jogging/Running: {Math.max(10, Math.round(yesterdayExcess / 10))} mins</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
+                        <span>🚶 Brisk Walking: {Math.max(15, Math.round(yesterdayExcess / 5))} mins</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="w-2.5 h-2.5 rounded-full bg-yellow-500"></span>
+                        <span>🚴 Cycling: {Math.max(12, Math.round(yesterdayExcess / 8))} mins</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* Fitness Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="bg-white p-5 rounded-3xl shadow-sm border border-gray-100/50 flex flex-col justify-between">
                 <span className="text-gray-400 text-[10px] font-bold uppercase">Exercise Minutes</span>
                 <span className="text-3xl font-extrabold mt-2 text-purple-600">{totalExercise}</span>
                 <span className="text-[10px] text-gray-500 mt-1">Goal: 45 mins/day</span>
-              </div>
-              <div className="bg-white p-5 rounded-3xl shadow-sm border border-gray-100/50 flex flex-col justify-between">
-                <span className="text-gray-400 text-[10px] font-bold uppercase">Estimated Steps</span>
-                <span className="text-3xl font-extrabold mt-2 text-emerald-600">{estimatedSteps.toLocaleString()}</span>
-                <span className="text-[10px] text-gray-500 mt-1">Goal: 10,000 steps</span>
-              </div>
-              <div className="bg-white p-5 rounded-3xl shadow-sm border border-gray-100/50 flex flex-col justify-between">
-                <span className="text-gray-400 text-[10px] font-bold uppercase">Distance Covered</span>
-                <span className="text-3xl font-extrabold mt-2 text-blue-600">{distanceCovered} km</span>
-                <span className="text-[10px] text-gray-500 mt-1">Based on step cadence</span>
               </div>
               <div className="bg-white p-5 rounded-3xl shadow-sm border border-gray-100/50 flex flex-col justify-between">
                 <span className="text-gray-400 text-[10px] font-bold uppercase">Water Hydration</span>
@@ -191,25 +307,98 @@ export default function BodyOverview() {
               </div>
             </div>
 
-            {/* Exercise graph */}
+            {/* Exercise & Yoga Recommendations (replaces old Activity Log graph) */}
             <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100/50">
-              <h3 className="font-extrabold text-gray-800 text-lg mb-4">Activity Log (Minutes)</h3>
-              <div className="h-64 w-full">
-                {checkins.length > 0 ? (
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={checkins}>
-                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f1f4" />
-                      <XAxis dataKey="date" stroke="#9ca3af" fontSize={11} tickLine={false} />
-                      <YAxis stroke="#9ca3af" fontSize={11} tickLine={false} />
-                      <Tooltip />
-                      <Bar dataKey="exercise_minutes" fill="#8b5cf6" radius={[4, 4, 0, 0]} />
-                    </BarChart>
-                  </ResponsiveContainer>
-                ) : (
-                  <div className="h-full flex items-center justify-center text-gray-400 text-sm">
-                    No activity entries found.
+              <h3 className="font-extrabold text-gray-800 text-lg mb-2">Tailored Exercise & Yoga Recommendations</h3>
+              <p className="text-xs text-gray-400 mb-6">Based on your activity profiles and yesterday's calorie balance.</p>
+              
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {/* Yoga Card */}
+                <div className="bg-gray-50 rounded-2xl border border-gray-100 overflow-hidden flex flex-col justify-between group hover:shadow-md transition duration-200">
+                  <div className="h-36 overflow-hidden relative">
+                    <img 
+                      src="https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&w=600&q=80" 
+                      alt="Yoga Session" 
+                      className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
+                    />
+                    <span className="absolute top-3 left-3 bg-purple-600 text-white text-[9px] font-extrabold px-2 py-0.5 rounded-full uppercase">Yoga & Stretch</span>
                   </div>
-                )}
+                  <div className="p-4 flex-1 flex flex-col justify-between">
+                    <div>
+                      <h4 className="font-bold text-gray-800 text-sm">Vinyasa Yoga & Flexibility</h4>
+                      <p className="text-xs text-gray-500 mt-1">Calm your mind, improve flexibility, and recover.</p>
+                    </div>
+                    <div className="mt-4 pt-3 border-t border-gray-100 flex items-center justify-between">
+                      <span className="text-xs font-bold text-purple-600">Duration: {yesterdayExcess > 0 ? "30 mins" : "20 mins"}</span>
+                      <a 
+                        href="https://www.youtube.com/watch?v=v7AYKMP6rOE" 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="bg-red-600 text-white font-extrabold text-[10px] px-3 py-1.5 rounded-lg flex items-center gap-1 hover:bg-red-700 transition"
+                      >
+                        ▶ Watch Video
+                      </a>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Jogging Card */}
+                <div className="bg-gray-50 rounded-2xl border border-gray-100 overflow-hidden flex flex-col justify-between group hover:shadow-md transition duration-200">
+                  <div className="h-36 overflow-hidden relative">
+                    <img 
+                      src="https://images.unsplash.com/photo-1476480862126-209bfaa8edc8?auto=format&fit=crop&w=600&q=80" 
+                      alt="Jogging Session" 
+                      className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
+                    />
+                    <span className="absolute top-3 left-3 bg-orange-600 text-white text-[9px] font-extrabold px-2 py-0.5 rounded-full uppercase">Cardio</span>
+                  </div>
+                  <div className="p-4 flex-1 flex flex-col justify-between">
+                    <div>
+                      <h4 className="font-bold text-gray-800 text-sm">Fat-Burning Jogging</h4>
+                      <p className="text-xs text-gray-500 mt-1">Efficient cardio to burn off excess calories.</p>
+                    </div>
+                    <div className="mt-4 pt-3 border-t border-gray-100 flex items-center justify-between">
+                      <span className="text-xs font-bold text-orange-600">Duration: {Math.max(20, Math.round(yesterdayExcess / 10 || 25))} mins</span>
+                      <a 
+                        href="https://www.youtube.com/watch?v=gN4r8a_X8d4" 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="bg-red-600 text-white font-extrabold text-[10px] px-3 py-1.5 rounded-lg flex items-center gap-1 hover:bg-red-700 transition"
+                      >
+                        ▶ Watch Video
+                      </a>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Cycling Card */}
+                <div className="bg-gray-50 rounded-2xl border border-gray-100 overflow-hidden flex flex-col justify-between group hover:shadow-md transition duration-200">
+                  <div className="h-36 overflow-hidden relative">
+                    <img 
+                      src="https://images.unsplash.com/photo-1485965120184-e220f721d03e?auto=format&fit=crop&w=600&q=80" 
+                      alt="Cycling Session" 
+                      className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
+                    />
+                    <span className="absolute top-3 left-3 bg-blue-600 text-white text-[9px] font-extrabold px-2 py-0.5 rounded-full uppercase">Endurance</span>
+                  </div>
+                  <div className="p-4 flex-1 flex flex-col justify-between">
+                    <div>
+                      <h4 className="font-bold text-gray-800 text-sm">Circadian Cardio Cycling</h4>
+                      <p className="text-xs text-gray-500 mt-1">Build stamina and burn active calories.</p>
+                    </div>
+                    <div className="mt-4 pt-3 border-t border-gray-100 flex items-center justify-between">
+                      <span className="text-xs font-bold text-blue-600">Duration: {Math.max(20, Math.round(yesterdayExcess / 8 || 30))} mins</span>
+                      <a 
+                        href="https://www.youtube.com/watch?v=yPM7nS7R6H4" 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="bg-red-600 text-white font-extrabold text-[10px] px-3 py-1.5 rounded-lg flex items-center gap-1 hover:bg-red-700 transition"
+                      >
+                        ▶ Watch Video
+                      </a>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -241,21 +430,69 @@ export default function BodyOverview() {
             {/* Stages & charts */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100/50">
-                <h3 className="font-extrabold text-gray-800 text-sm mb-4">Sleep Stages Distribution</h3>
-                <div className="h-64">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={sleepStagesData} layout="vertical" margin={{ left: 20 }}>
-                      <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#f1f1f4" />
-                      <XAxis type="number" stroke="#9ca3af" fontSize={11} />
-                      <YAxis type="category" dataKey="name" stroke="#9ca3af" fontSize={11} tickLine={false} />
-                      <Tooltip />
-                      <Bar dataKey="minutes" radius={[0, 4, 4, 0]}>
-                        {sleepStagesData.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={entry.color} />
-                        ))}
-                      </Bar>
-                    </BarChart>
-                  </ResponsiveContainer>
+                <h3 className="font-extrabold text-gray-800 text-sm mb-2">Light Sleeper Relaxing Playlist</h3>
+                <p className="text-xs text-gray-400 mb-4">Calm your mind and sink into deep restorative sleep with these relaxing audio tracks.</p>
+                
+                <div className="space-y-4 max-h-[260px] overflow-y-auto pr-2">
+                  <div className="flex items-center gap-4 p-3 bg-gray-50 rounded-2xl border border-gray-100 hover:border-purple-300 transition duration-200">
+                    <img 
+                      src="https://images.unsplash.com/photo-1506318137071-a8e063b4bec0?auto=format&fit=crop&w=120&h=80&fit=crop&q=80" 
+                      alt="Deep Sleep Music" 
+                      className="w-16 h-12 rounded-xl object-cover"
+                    />
+                    <div className="flex-1 min-w-0">
+                      <h4 className="font-bold text-gray-800 text-xs truncate">Deep Sleep Healing Music</h4>
+                      <p className="text-[10px] text-gray-400">8 Hours of delta wave frequencies.</p>
+                    </div>
+                    <a 
+                      href="https://www.youtube.com/watch?v=Wnn47ObA8Gs" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="bg-red-600 hover:bg-red-700 text-white font-extrabold text-[9px] px-2.5 py-1.5 rounded-lg flex items-center gap-1 shrink-0"
+                    >
+                      ▶ Play
+                    </a>
+                  </div>
+
+                  <div className="flex items-center gap-4 p-3 bg-gray-50 rounded-2xl border border-gray-100 hover:border-purple-300 transition duration-200">
+                    <img 
+                      src="https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=120&h=80&fit=crop&q=80" 
+                      alt="Lofi Beats" 
+                      className="w-16 h-12 rounded-xl object-cover"
+                    />
+                    <div className="flex-1 min-w-0">
+                      <h4 className="font-bold text-gray-800 text-xs truncate">Chill Lofi Sleep & Study Beats</h4>
+                      <p className="text-[10px] text-gray-400">Gentle ambient room lofi tracks.</p>
+                    </div>
+                    <a 
+                      href="https://www.youtube.com/watch?v=jfKfPfyJRdk" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="bg-red-600 hover:bg-red-700 text-white font-extrabold text-[9px] px-2.5 py-1.5 rounded-lg flex items-center gap-1 shrink-0"
+                    >
+                      ▶ Play
+                    </a>
+                  </div>
+
+                  <div className="flex items-center gap-4 p-3 bg-gray-50 rounded-2xl border border-gray-100 hover:border-purple-300 transition duration-200">
+                    <img 
+                      src="https://images.unsplash.com/photo-1515694346937-94d85e41e6f0?auto=format&fit=crop&w=120&h=80&fit=crop&q=80" 
+                      alt="Rain Sounds" 
+                      className="w-16 h-12 rounded-xl object-cover"
+                    />
+                    <div className="flex-1 min-w-0">
+                      <h4 className="font-bold text-gray-800 text-xs truncate">Heavy Rain & Ocean Waves</h4>
+                      <p className="text-[10px] text-gray-400">Natural white noise for sound sleep.</p>
+                    </div>
+                    <a 
+                      href="https://www.youtube.com/watch?v=q76bMs-NwRk" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="bg-red-600 hover:bg-red-700 text-white font-extrabold text-[9px] px-2.5 py-1.5 rounded-lg flex items-center gap-1 shrink-0"
+                    >
+                      ▶ Play
+                    </a>
+                  </div>
                 </div>
               </div>
 
@@ -265,14 +502,14 @@ export default function BodyOverview() {
                     <Sparkles className="w-3 h-3 text-pink-300" />
                     <span>AI Sleep Insights</span>
                   </div>
-                  <h4 className="text-lg font-bold mb-3">Optimal Recovery Cycle</h4>
+                  <h4 className="text-lg font-bold mb-3">{sleepInsights.title}</h4>
                   <p className="text-xs leading-relaxed text-purple-100 mb-4">
-                    Based on your active check-ins, your deep sleep levels drop significantly when caffeine intake is logged past 4:00 PM or when screen activities are registered under 30 minutes before sleep.
+                    {sleepInsights.desc}
                   </p>
                   <ul className="list-disc pl-5 text-xs text-purple-200 space-y-1.5">
-                    <li>Create a screen sunset routine 30 minutes before bed</li>
-                    <li>Avoid caffeine blocks after 02:00 PM</li>
-                    <li>Aim for regular sleep onset window (approx. 10:30 PM)</li>
+                    {sleepInsights.tips.map((tip, index) => (
+                      <li key={index}>{tip}</li>
+                    ))}
                   </ul>
                 </div>
               </div>
@@ -296,6 +533,12 @@ export default function BodyOverview() {
                 ></div>
               </div>
               <p className="text-[10px] text-gray-400">Calories remaining: {targetCalories - totalCalories} kcal</p>
+              {totalCalories > targetCalories && (
+                <div className="mt-4 bg-red-50 border border-red-250 rounded-2xl p-4 flex items-center gap-3 text-red-700 text-xs font-semibold animate-pulse">
+                  <Flame className="w-5 h-5 text-red-500 shrink-0" />
+                  <span>Calories consumed are taken more than the daily target limit! Try to do some extra exercise today to burn them off.</span>
+                </div>
+              )}
             </div>
 
             {/* Nutrition columns */}

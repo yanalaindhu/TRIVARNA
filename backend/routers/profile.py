@@ -28,20 +28,19 @@ def calculate_streak(checkin_records):
     if not parsed_dates:
         return 0
         
+    latest_date = max(parsed_dates)
     today = date.today()
-    yesterday = today - timedelta(days=1)
     
-    # Streak can start today or yesterday
-    current_date = today if today in parsed_dates else yesterday
-    if current_date not in parsed_dates:
-        return 0
+    # Streak is active if the user has checked in today or yesterday
+    if latest_date >= today - timedelta(days=1):
+        streak = 0
+        current_date = latest_date
+        while current_date in parsed_dates:
+            streak += 1
+            current_date -= timedelta(days=1)
+        return streak
         
-    streak = 0
-    while current_date in parsed_dates:
-        streak += 1
-        current_date -= timedelta(days=1)
-        
-    return streak
+    return 0
 
 def get_dynamic_badges(checkin_records, streak):
     badges = []

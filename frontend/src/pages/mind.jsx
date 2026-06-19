@@ -244,32 +244,10 @@ export default function MindOverview() {
               
               <div className="space-y-6">
                 <div>
-                  <h4 className="font-bold text-purple-200 text-xs uppercase tracking-wider mb-2">Strengths</h4>
-                  {insights && insights.strengths && insights.strengths.length > 0 ? (
-                    <ul className="list-disc pl-5 text-xs text-purple-100 space-y-1.5">
-                      {insights.strengths.slice(0, 3).map((s, idx) => <li key={idx}>{s}</li>)}
-                    </ul>
-                  ) : (
-                    <p className="text-xs text-purple-200 italic">No strengths calculated. Add check-ins to unlock.</p>
-                  )}
-                </div>
-
-                <div>
-                  <h4 className="font-bold text-red-300 text-xs uppercase tracking-wider mb-2">Risks & Vulnerabilities</h4>
-                  {insights && insights.risks && insights.risks.length > 0 ? (
-                    <ul className="list-disc pl-5 text-xs text-red-100 space-y-1.5">
-                      {insights.risks.slice(0, 3).map((r, idx) => <li key={idx}>{r}</li>)}
-                    </ul>
-                  ) : (
-                    <p className="text-xs text-purple-200 italic">No risks detected.</p>
-                  )}
-                </div>
-
-                <div>
-                  <h4 className="font-bold text-yellow-300 text-xs uppercase tracking-wider mb-2">Recommendations</h4>
+                  <h4 className="font-bold text-yellow-300 text-sm uppercase tracking-wider mb-3">Recommendations</h4>
                   {insights && insights.recommendations && insights.recommendations.length > 0 ? (
-                    <ul className="list-disc pl-5 text-xs text-yellow-100 space-y-1.5">
-                      {insights.recommendations.slice(0, 3).map((rec, idx) => <li key={idx}>{rec}</li>)}
+                    <ul className="list-disc pl-5 text-xs text-yellow-100 space-y-2.5">
+                      {insights.recommendations.slice(0, 3).map((rec, idx) => <li key={idx} className="leading-relaxed">{rec}</li>)}
                     </ul>
                   ) : (
                     <p className="text-xs text-purple-200 italic">No recommendations yet.</p>

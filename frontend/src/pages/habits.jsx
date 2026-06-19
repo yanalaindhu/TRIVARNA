@@ -11,12 +11,10 @@ export default function HabitsPage() {
   const [newHabit, setNewHabit] = useState({ habit_name: "", category: "Mind", target_frequency: "Daily" });
   const [addingHabit, setAddingHabit] = useState(false);
   
-  // Weekly checkin completion mock state tracker for local interaction
-  // Maps habitId -> array of weekday booleans [Mon, Tue, Wed, Thu, Fri, Sat, Sun]
   const [weeklyCompletions, setWeeklyCompletions] = useState({});
 
   const userId = localStorage.getItem("userId");
-  const weekdays = ["M", "T", "W", "T", "F", "S", "S"];
+  const weeks = ["Week 1", "Week 2", "Week 3", "Week 4", "Week 5"];
 
   const loadHabits = async () => {
     if (!userId) {
@@ -29,10 +27,27 @@ export default function HabitsPage() {
       const fetchedHabits = response.data || [];
       setHabits(fetchedHabits);
       
-      // Initialize weekly completions mock array [Mon-Sun] for UI checkboxes
+      // Initialize weekly completions array [Week 1 - Week 5] based on fetched habit logs
       const initialWeekly = {};
+      const currentMonth = new Date().getMonth();
+      const currentYear = new Date().getFullYear();
+      
       fetchedHabits.forEach(habit => {
-        initialWeekly[habit.id] = [false, false, false, false, false, false, false];
+        const weeksList = [false, false, false, false, false];
+        if (habit.habit_logs) {
+          habit.habit_logs.forEach(log => {
+            if (log.completed) {
+              const logDate = new Date(log.completed_date);
+              if (logDate.getMonth() === currentMonth && logDate.getFullYear() === currentYear) {
+                const weekIdx = Math.ceil(logDate.getDate() / 7) - 1;
+                if (weekIdx >= 0 && weekIdx < 5) {
+                  weeksList[weekIdx] = true;
+                }
+              }
+            }
+          });
+        }
+        initialWeekly[habit.id] = weeksList;
       });
       setWeeklyCompletions(initialWeekly);
     } catch (err) {
@@ -73,7 +88,7 @@ export default function HabitsPage() {
 
   const handleToggleDay = async (habitId, dayIndex) => {
     // Optimistic UI updates
-    const currentList = weeklyCompletions[habitId] || [false, false, false, false, false, false, false];
+    const currentList = weeklyCompletions[habitId] || [false, false, false, false, false];
     const isCompleted = !currentList[dayIndex];
     const updatedDays = [...currentList];
     updatedDays[dayIndex] = isCompleted;
@@ -157,7 +172,7 @@ export default function HabitsPage() {
                   >
                     <option value="Mind">Mind Wellbeing</option>
                     <option value="Body">Body Tracker</option>
-                    <option value="Lifestyle">Life & Lifestyle</option>
+                    <option value="Lifestyle">Lifestyle</option>
                   </select>
                 </div>
 
@@ -194,7 +209,7 @@ export default function HabitsPage() {
             <div className="space-y-6">
               {habits.length > 0 ? (
                 habits.map((habit, idx) => {
-                  const checkList = weeklyCompletions[habit.id] || [false, false, false, false, false, false, false];
+                  const checkList = weeklyCompletions[habit.id] || [false, false, false, false, false];
                   return (
                     <div key={idx} className="flex justify-between items-center p-4 bg-gray-50 rounded-2xl border border-gray-100 animate-in fade-in duration-200">
                       <div>
@@ -207,23 +222,34 @@ export default function HabitsPage() {
 
                       {/* Weekly Calendar checkmark buttons */}
                       <div className="flex gap-2.5">
-                        {weekdays.map((day, dIdx) => (
-                          <div key={dIdx} className="flex flex-col items-center gap-1">
-                            <span className="text-[9px] font-bold text-gray-400">{day}</span>
-                            <button
-                              onClick={() => handleToggleDay(habit.id, dIdx)}
-                              className={`
-                                w-8 h-8 rounded-xl border flex items-center justify-center font-bold text-xs transition duration-200 cursor-pointer
-                                ${checkList[dIdx]
-                                  ? "bg-green-500 border-green-500 text-white shadow-sm"
-                                  : "border-gray-200 bg-white text-gray-400 hover:border-purple-300"
-                                }
-                              `}
-                            >
-                              {checkList[dIdx] ? <Check className="w-4 h-4" /> : null}
-                            </button>
-                          </div>
-                        ))}
+                        {weeks.map((day, dIdx) => {
+                          const currentWeekIndex = Math.ceil(new Date().getDate() / 7) - 1;
+                          const isCurrentWeek = dIdx === currentWeekIndex;
+                          return (
+                            <div key={dIdx} className="flex flex-col items-center gap-1">
+                              <span className="text-[9px] font-bold text-gray-400">{day}</span>
+                              <button
+                                disabled={!isCurrentWeek}
+                                onClick={() => handleToggleDay(habit.id, dIdx)}
+                                className={`
+                                  w-10 h-10 rounded-xl border flex items-center justify-center font-bold text-xs transition duration-200
+                                  ${!isCurrentWeek
+                                    ? "cursor-not-allowed opacity-50 bg-gray-100 border-gray-200 text-gray-300"
+                                    : "cursor-pointer"
+                                  }
+                                  ${checkList[dIdx]
+                                    ? "bg-green-500 border-green-500 text-white shadow-sm"
+                                    : isCurrentWeek
+                                      ? "border-gray-200 bg-white text-gray-400 hover:border-purple-300"
+                                      : "border-gray-200 bg-gray-50 text-gray-300"
+                                  }
+                                `}
+                              >
+                                {checkList[dIdx] ? <Check className="w-4 h-4" /> : null}
+                              </button>
+                            </div>
+                          );
+                        })}
                       </div>
                     </div>
                   );

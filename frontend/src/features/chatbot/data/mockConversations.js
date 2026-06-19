@@ -62,7 +62,7 @@ export const MOCK_RESPONSES = {
   },
   hybrid_rag: {
     'generate life balance summary': {
-      text: 'Unified Multi-RAG balance synthesis completed. \n\n* **Overall Balance**: 74% (Healthy Baseline)\n* **🧠 Mind**: Moderate stress (3/5) with stable emotional resilience. Cognitive fatigue accumulates in the late afternoon.\n* **💪 Body**: Rest profile is slightly constrained (average 6.8h sleep). Hydration (2.1L) needs optimization.\n* **✨ Soul (Lifestyle)**: Outstanding habit compliance (82%), but time-blocking needs adjustment around peak focus.\n\n**Key Recommendation**: Align your exercise block with your afternoon energy drop (around 5:30 PM) to reset cognitive load and promote better sleep onset.',
+      text: 'Unified Multi-RAG balance synthesis completed. \n\n* **Overall Balance**: 74% (Healthy Baseline)\n* **🧠 Mind**: Moderate stress (3/5) with stable emotional resilience. Cognitive fatigue accumulates in the late afternoon.\n* **💪 Body**: Rest profile is slightly constrained (average 6.8h sleep). Hydration (2.1L) needs optimization.\n* **✨ Life (Lifestyle)**: Outstanding habit compliance (82%), but time-blocking needs adjustment around peak focus.\n\n**Key Recommendation**: Align your exercise block with your afternoon energy drop (around 5:30 PM) to reset cognitive load and promote better sleep onset.',
       sources: ['Unified TRIVARNA Vector Master']
     },
     'create balanced schedule': {

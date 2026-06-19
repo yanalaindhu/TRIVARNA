@@ -90,6 +90,63 @@ from services.profile_services import (
     calculate_overall_score,
     calculate_burnout_risk
 )
+
+def calculate_onboarding_recommendations(onboarding_data, mind_score, body_score, lifestyle_score):
+    recs = []
+    
+    # Check goals
+    goals = onboarding_data.get("goals", {})
+    selected_goals = goals.get("selectedGoals", []) if isinstance(goals, dict) else []
+    
+    # 1. Mind Recommendations
+    if mind_score < 70:
+        recs.append("Integrate 10 minutes of daily mindfulness or breathwork to manage stress spikes.")
+    if "reduce_stress" in selected_goals or "improve_mental_health" in selected_goals:
+        recs.append("Dedicate a quiet window before sleep for reflective journaling to unload mental loops.")
+    if not recs:
+        recs.append("Practice regular mental check-ins to monitor daily stress changes.")
+        
+    # 2. Body Recommendations
+    body_data = onboarding_data.get("body_data", {})
+    sleep_str = body_data.get("sleep", "")
+    hydration_val = body_data.get("hydration", 5)
+    
+    if body_score < 70 or sleep_str in ["<5 Hours", "5-6 Hours"]:
+        recs.append("Restructure your sleep routine to target 7-8 hours of sleep, avoiding screens 1 hour before bed.")
+    
+    try:
+        hyd = int(hydration_val)
+    except (ValueError, TypeError):
+        hyd = 5
+        
+    if hyd < 6:
+        recs.append("Increase daily water intake to at least 8-10 glasses (2.5L) to optimize focus and energy.")
+    if "exercise_more" in selected_goals:
+        recs.append("Schedule three 30-minute physical sessions (cardio, strength, or yoga) per week.")
+    if len(recs) < 3:
+        recs.append("Maintain a consistent bedtime and waking routine to optimize circadian rhythm.")
+        
+    # 3. Life / Lifestyle Recommendations
+    life_context = onboarding_data.get("life_context", {})
+    occupation = life_context.get("occupation", "")
+    
+    if lifestyle_score < 70:
+        recs.append("Implement structured study or work focus blocks (e.g. Pomodoro technique) to combat procrastination.")
+    if "improve_focus" in selected_goals or "build_discipline" in selected_goals:
+        recs.append("Utilize focused time blocks and disable non-essential digital notifications during key tasks.")
+    if occupation in ["student", "working_professional"]:
+        recs.append("Establish clear boundaries between study/work hours and offline leisure to prevent burnout.")
+        
+    # De-duplicate while preserving order
+    seen = set()
+    unique_recs = []
+    for r in recs:
+        if r not in seen:
+            seen.add(r)
+            unique_recs.append(r)
+            
+    return unique_recs[:4]
+
 @router.post("/complete/{user_id}")
 def complete_onboarding(user_id: str):
 
@@ -156,6 +213,14 @@ def complete_onboarding(user_id: str):
             except Exception as e:
                 print(f"Warning: Failed to update profiles table: {e}")
 
+        # Compute dynamic focus areas (recommendations)
+        dynamic_recs = calculate_onboarding_recommendations(
+            onboarding,
+            mind_score,
+            body_score,
+            lifestyle_score
+        )
+
         # Save Analysis
 
         analysis = (
@@ -169,21 +234,11 @@ def complete_onboarding(user_id: str):
                 "overall_score": overall_score,
                 "burnout_risk": burnout_risk,
 
-                "strengths": [
-                    "Motivated"
-                ],
+                "strengths": [],
+                "risks": [],
+                "focus_areas": dynamic_recs,
 
-                "risks": [
-                    "Stress Management"
-                ],
-
-                "focus_areas": [
-                    "Sleep",
-                    "Consistency"
-                ],
-
-                "coach_summary":
-                "Your onboarding analysis is completed."
+                "coach_summary": "Your onboarding analysis is completed."
             })
             .execute()
         )
@@ -294,7 +349,18 @@ def generate_ai_plan(user_id: str):
 
         profile_data = profile.data[0]
 
-        plan = generate_plan(profile_data)
+        onboarding = (
+            supabase
+            .table("onboarding_responses")
+            .select("*")
+            .eq("user_id", user_id)
+            .order("created_at", desc=True)
+            .limit(1)
+            .execute()
+        )
+        onboarding_data = onboarding.data[0] if onboarding.data else None
+
+        plan = generate_plan(profile_data, onboarding_data)
 
         result = (
             supabase

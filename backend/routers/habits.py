@@ -37,7 +37,7 @@ async def get_habits(user_id: str):
     result = (
         supabase
         .table("habits")
-        .select("*")
+        .select("*, habit_logs(*)")
         .eq("user_id", user_id)
         .execute()
     )
