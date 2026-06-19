@@ -31,6 +31,14 @@ origins = [
     "http://127.0.0.1:5173",
     "http://localhost:5174",
     "http://127.0.0.1:5174",
+
+    # Current Vercel URL
+    "https://trivarna-frontend.vercel.app",
+
+    # Future URLs
+    "https://trivarna.vercel.app",
+    "https://trivarna-ai.vercel.app",
+    "https://trivarna-app.vercel.app",
 ]
 
 env_origins = os.getenv("ALLOWED_ORIGINS")
